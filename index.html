@@ -1,1 +1,358 @@
-<iframe src="https://claude.site/public/artifacts/ea7192e8-616a-443c-9b81-ec5f4fd10c4c/embed" title="Claude Artifact" width="100%" height="600" frameborder="0" allow="clipboard-write" allowfullscreen></iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timebreak Challenges</title>
+  <link rel="alternate" type="application/rss+xml" title="Timebreak RSS" href="rss.xml" />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #151c33;
+      --muted: #95a1c4;
+      --text: #ecf0ff;
+      --accent: #7c9cff;
+      --accent-2: #52e7c5;
+      --danger: #ff7a7a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top right, #172449 0%, var(--bg) 40%);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+    }
+
+    h1 { margin: 0 0 0.25rem; font-size: clamp(1.5rem, 5vw, 2.8rem); }
+    .sub { color: var(--muted); margin: 0 0 1.5rem; }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: color-mix(in oklab, var(--card), black 7%);
+      border: 1px solid #273158;
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 10px 28px rgb(0 0 0 / 0.2);
+    }
+
+    .stat { font-size: 2rem; font-weight: 700; }
+    .label { color: var(--muted); font-size: 0.92rem; }
+
+    .progress {
+      background: #0f1630;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 10px;
+      margin-top: 0.55rem;
+      border: 1px solid #24305f;
+    }
+
+    .progress > div {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      height: 100%;
+      transition: width 220ms ease;
+    }
+
+    button {
+      border: 0;
+      background: linear-gradient(90deg, var(--accent), #6484ff);
+      color: white;
+      border-radius: 10px;
+      font-weight: 600;
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+    }
+
+    button.secondary { background: #273158; }
+    button.danger { background: #612833; border: 1px solid #7c3644; }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.7rem;
+    }
+
+    .section-title {
+      margin: 1.2rem 0 0.6rem;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    ul.list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .challenge-title { margin: 0 0 0.4rem; font-size: 1.02rem; }
+    .meta { color: var(--muted); font-size: 0.85rem; }
+
+    .linkline {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    a { color: #9db4ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.76rem;
+      padding: 0.25rem 0.45rem;
+      border-radius: 999px;
+      background: #26345f;
+      border: 1px solid #394982;
+      margin-right: 0.4rem;
+      color: #c8d4ff;
+    }
+
+    .hidden { display: none; }
+
+    .empty {
+      color: var(--muted);
+      padding: 1rem;
+      border: 1px dashed #36467b;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>⏱️ Timebreak Challenges</h1>
+    <p class="sub">Daily coding challenges from multiple sources. Every <strong>2 points = 1 coin</strong>.</p>
+
+    <section class="grid" aria-label="stats">
+      <article class="card">
+        <div class="label">Points</div>
+        <div id="points" class="stat">0</div>
+        <div class="actions">
+          <button id="addPointBtn">+1 point</button>
+          <button id="addTwoBtn" class="secondary">+2 points</button>
+        </div>
+      </article>
+      <article class="card">
+        <div class="label">Coins (auto minted)</div>
+        <div id="coins" class="stat">0</div>
+        <div class="label" id="toNextCoin">2 points until next coin</div>
+        <div class="progress"><div id="coinProgress" style="width:0%"></div></div>
+      </article>
+      <article class="card">
+        <div class="label">Today</div>
+        <div class="stat" id="todayDate">-</div>
+        <div class="label">Challenge list updates every day (UTC).</div>
+      </article>
+    </section>
+
+    <section>
+      <h2 class="section-title">🎯 Daily picks (one per source)</h2>
+      <ul id="dailyList" class="list"></ul>
+      <p id="dailyEmpty" class="empty hidden">No daily challenges loaded yet. Try refresh.</p>
+    </section>
+
+    <section>
+      <h2 class="section-title">📡 Timebreak RSS Feed (opens here first)</h2>
+      <p class="sub">This feed list links into Timebreak first, so challenge links open on this page before going to the source.</p>
+      <ul id="rssList" class="list"></ul>
+      <p id="rssEmpty" class="empty hidden">RSS feed is empty right now.</p>
+    </section>
+
+    <section id="challengeView" class="card hidden" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'timebreak-progress-v2';
+    const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"points":0}');
+    if (typeof state.points !== 'number' || state.points < 0) state.points = 0;
+
+    const sources = [
+      { name: 'Reddit r/dailyprogrammer', url: 'https://www.reddit.com/r/dailyprogrammer/.rss' },
+      { name: 'TopCoder Challenges Blog', url: 'https://www.topcoder.com/challenges/rss' },
+      { name: 'Kaggle Blog', url: 'https://medium.com/feed/kaggle-blog' }
+    ];
+
+    const fallbackChallenges = [
+      {
+        id: 'fallback-1',
+        source: 'Timebreak Starter',
+        title: 'Build a habit tracker with streak logic',
+        link: 'https://github.com/topics/habit-tracker',
+        date: '2026-03-24',
+        description: 'Create a minimal app with daily check-ins, streak resets, and visual progress.'
+      },
+      {
+        id: 'fallback-2',
+        source: 'Timebreak Starter',
+        title: 'Implement Dijkstra pathfinding on a grid',
+        link: 'https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm',
+        date: '2026-03-24',
+        description: 'Given blocked cells, compute shortest path and draw the solution.'
+      }
+    ];
+
+    const pointsEl = document.getElementById('points');
+    const coinsEl = document.getElementById('coins');
+    const toNextCoinEl = document.getElementById('toNextCoin');
+    const coinProgressEl = document.getElementById('coinProgress');
+    const todayDateEl = document.getElementById('todayDate');
+    const challengeView = document.getElementById('challengeView');
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ points: state.points }));
+    }
+
+    function coinCount(points) {
+      return Math.floor(points / 2);
+    }
+
+    function updateStats() {
+      const points = state.points;
+      const coins = coinCount(points);
+      const remaining = (2 - (points % 2)) % 2;
+      const progressPercent = (points % 2) * 100;
+
+      pointsEl.textContent = String(points);
+      coinsEl.textContent = String(coins);
+      toNextCoinEl.textContent = remaining === 0 ? 'Coin minted! Keep going 🚀' : `${remaining} point until next coin`;
+      coinProgressEl.style.width = `${progressPercent}%`;
+      todayDateEl.textContent = new Date().toISOString().slice(0, 10);
+    }
+
+    function addPoints(amount) {
+      state.points += amount;
+      save();
+      updateStats();
+    }
+
+    document.getElementById('addPointBtn').addEventListener('click', () => addPoints(1));
+    document.getElementById('addTwoBtn').addEventListener('click', () => addPoints(2));
+
+    async function fetchFeed(source) {
+      const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(source.url)}`;
+      const res = await fetch(proxiedUrl);
+      if (!res.ok) throw new Error(`Failed ${source.name}`);
+      const text = await res.text();
+      const xml = new DOMParser().parseFromString(text, 'text/xml');
+      const items = Array.from(xml.querySelectorAll('item')).slice(0, 10);
+
+      return items.map((item, idx) => ({
+        id: `${source.name.toLowerCase().replace(/\W+/g, '-')}-${idx}`,
+        source: source.name,
+        title: item.querySelector('title')?.textContent?.trim() || 'Untitled challenge',
+        link: item.querySelector('link')?.textContent?.trim() || source.url,
+        date: item.querySelector('pubDate')?.textContent?.trim() || new Date().toUTCString(),
+        description: (item.querySelector('description')?.textContent || 'No description').replace(/<[^>]+>/g, '').trim()
+      }));
+    }
+
+    function pickDaily(items) {
+      if (!items.length) return [];
+      const day = Math.floor(Date.now() / 86400000);
+      const grouped = items.reduce((acc, it) => {
+        (acc[it.source] ||= []).push(it);
+        return acc;
+      }, {});
+
+      return Object.values(grouped).map(group => group[day % group.length]);
+    }
+
+    function cardTemplate(challenge) {
+      return `
+        <li class="card">
+          <h3 class="challenge-title">${challenge.title}</h3>
+          <div class="meta"><span class="badge">${challenge.source}</span>${new Date(challenge.date).toUTCString()}</div>
+          <p>${challenge.description.slice(0, 200) || 'No description provided.'}</p>
+          <div class="linkline">
+            <a href="#challenge=${encodeURIComponent(challenge.id)}">Open on Timebreak</a>
+            <a href="${challenge.link}" target="_blank" rel="noopener noreferrer">Source</a>
+          </div>
+        </li>
+      `;
+    }
+
+    function renderList(id, challenges, emptyId) {
+      const list = document.getElementById(id);
+      const empty = document.getElementById(emptyId);
+      if (!challenges.length) {
+        list.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      list.innerHTML = challenges.map(cardTemplate).join('');
+    }
+
+    function showChallengeFromHash(challenges) {
+      const wanted = decodeURIComponent((location.hash.match(/challenge=([^&]+)/)?.[1] || '').trim());
+      if (!wanted) {
+        challengeView.classList.add('hidden');
+        challengeView.innerHTML = '';
+        return;
+      }
+
+      const found = challenges.find(c => c.id === wanted);
+      if (!found) {
+        challengeView.classList.remove('hidden');
+        challengeView.innerHTML = `<h3>Challenge not found</h3><p>Try selecting one from the RSS list.</p>`;
+        return;
+      }
+
+      challengeView.classList.remove('hidden');
+      challengeView.innerHTML = `
+        <h2>${found.title}</h2>
+        <p class="meta"><span class="badge">${found.source}</span>${new Date(found.date).toUTCString()}</p>
+        <p>${found.description || 'No description from feed.'}</p>
+        <div class="actions">
+          <button id="completeChallengeBtn">Mark complete (+2 points)</button>
+          <a href="${found.link}" target="_blank" rel="noopener noreferrer">Open original source ↗</a>
+        </div>
+      `;
+
+      document.getElementById('completeChallengeBtn').addEventListener('click', () => addPoints(2));
+    }
+
+    async function initChallenges() {
+      const all = [];
+      for (const source of sources) {
+        try {
+          const items = await fetchFeed(source);
+          all.push(...items);
+        } catch (err) {
+          console.warn(err.message);
+        }
+      }
+
+      const merged = all.length ? all : fallbackChallenges;
+      const daily = pickDaily(merged);
+      renderList('dailyList', daily, 'dailyEmpty');
+      renderList('rssList', merged, 'rssEmpty');
+      showChallengeFromHash(merged);
+      window.addEventListener('hashchange', () => showChallengeFromHash(merged));
+    }
+
+    updateStats();
+    initChallenges();
+  </script>
+</body>
+</html>
