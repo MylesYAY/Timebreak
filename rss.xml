@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Timebreak Challenge Feed</title>
+    <link>https://example.com/timebreak/index.html</link>
+    <description>Timebreak internal feed. Items open on Timebreak first via hash routes.</description>
+    <item>
+      <title>Habit Tracker with Streak Logic</title>
+      <link>index.html#challenge=fallback-1</link>
+      <guid>timebreak-fallback-1</guid>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 GMT</pubDate>
+      <description>Build a minimal habit tracker and maintain day streaks.</description>
+    </item>
+    <item>
+      <title>Dijkstra on a Grid</title>
+      <link>index.html#challenge=fallback-2</link>
+      <guid>timebreak-fallback-2</guid>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 GMT</pubDate>
+      <description>Compute shortest path on a blocked 2D grid.</description>
+    </item>
+  </channel>
+</rss>
