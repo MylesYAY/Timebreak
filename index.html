@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Time Break</title>
+<title>Timebreak</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -610,36 +610,66 @@ function loadData(){
   if(ownedThemes.indexOf('myles')===-1)ownedThemes.push('myles');
   if(ownedPfps.indexOf('😊')===-1)ownedPfps.push('😊');
 }
+/* btoa/atob fail on emoji — encode to UTF-8 bytes first */
+function toBase64(str){
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,function(_,p){return String.fromCharCode('0x'+p)}));
+}
+function fromBase64(b64){
+  return decodeURIComponent(atob(b64).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''));
+}
 function genSaveCode(){
   var d={c:coins,ot:ownedThemes,t:activeTheme,op:ownedPfps,p:activePfp,u:username,s:{se:completedSessions,m:todayMinutes,b:todayBreaks,st:streak}};
-  return btoa(JSON.stringify(d));
+  try{return toBase64(JSON.stringify(d))}catch(e){return ''}
 }
 function restoreFromCode(){
   var raw=document.getElementById('restoreInput').value.trim();
   if(!raw){showToast('❌ Paste a save code first!');return}
   try{
-    var d=JSON.parse(atob(raw));
-    if(d.c!==undefined)coins=d.c;
-    if(d.ot)ownedThemes=d.ot;
-    if(d.t)activeTheme=d.t;
-    if(d.op)ownedPfps=d.op;
-    if(d.p)activePfp=d.p;
-    if(d.u)username=d.u;
+    var d=JSON.parse(fromBase64(raw));
+    if(typeof d.c==='number')coins=d.c;
+    if(Array.isArray(d.ot))ownedThemes=d.ot;
+    if(typeof d.t==='string')activeTheme=d.t;
+    if(Array.isArray(d.op))ownedPfps=d.op;
+    if(typeof d.p==='string')activePfp=d.p;
+    if(typeof d.u==='string')username=d.u;
     if(d.s){completedSessions=d.s.se||0;todayMinutes=d.s.m||0;todayBreaks=d.s.b||0;streak=d.s.st||0}
     if(ownedThemes.indexOf('myles')===-1)ownedThemes.push('myles');
     if(ownedPfps.indexOf('😊')===-1)ownedPfps.push('😊');
-    saveData();applyTheme(activeTheme);updateCoinDisplays();updateHeaderPfp();updateProfilePage();
+    saveData();
+    applyTheme(activeTheme);
+    updateCoinDisplays();
+    updateHeaderPfp();
+    updateProfilePage();
+    updateSaveCode();
     document.getElementById('statSessions').textContent=completedSessions;
     document.getElementById('statMinutes').textContent=todayMinutes>=60?Math.floor(todayMinutes/60):todayMinutes;
     document.getElementById('statBreaks').textContent=todayBreaks;
     document.getElementById('statStreak').textContent=streak+'🔥';
+    if(document.getElementById('usernameInput'))document.getElementById('usernameInput').value=username;
     showToast('✅ Data restored successfully!');
     document.getElementById('restoreInput').value='';
-  }catch(e){showToast('❌ Invalid save code!')}
+  }catch(e){
+    console.error('Restore error:',e);
+    showToast('❌ Invalid save code — check it and try again');
+  }
 }
 function copySaveCode(){
   var code=genSaveCode();
-  navigator.clipboard.writeText(code).then(function(){showToast('📋 Save code copied!')}).catch(function(){showToast('❌ Copy failed — select the code manually')});
+  if(!code){showToast('❌ Could not generate code');return}
+  /* Update the box too */
+  var box=document.getElementById('saveCodeBox');if(box)box.textContent=code;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(function(){showToast('📋 Save code copied!')}).catch(function(){fallbackCopy(code)});
+  }else{fallbackCopy(code)}
+}
+function fallbackCopy(text){
+  /* Select the code box text as a fallback */
+  var box=document.getElementById('saveCodeBox');
+  if(box){
+    var range=document.createRange();range.selectNodeContents(box);
+    var sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+    try{document.execCommand('copy');showToast('📋 Copied! (fallback)')}catch(e){showToast('⚠️ Select the code manually and copy it')}
+  }
 }
 
 /* ── DRAWER ── */
@@ -1100,10 +1130,13 @@ function shareCard(){
     +'│  🪙 '+coins+' coins\n'
     +'└─────────────────────┘\n'
     +'Studying with TimeBreak 🚀';
-  navigator.clipboard.writeText(text).then(function(){
+  var show=function(){
     document.getElementById('shareModalText').textContent=text;
     document.getElementById('shareModal').classList.add('open');
-  }).catch(function(){showToast('❌ Copy failed')});
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(show).catch(show);
+  }else{show()}
 }
 function closeShareModal(e){if(!e||e.target===document.getElementById('shareModal'))document.getElementById('shareModal').classList.remove('open')}
 
