@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Timebreak</title>
+<title>Time Break</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -530,18 +530,41 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
         </div>
         <h2 style="margin-bottom:12px">📤 Share Card</h2>
         <div class="share-card-preview" id="shareCardPreview">
-          <span class="sc-pfp" id="scPfp">😊</span>
-          <div class="sc-name" id="scName">StudyChamp</div>
-          <div class="sc-stats">
-            <div class="sc-stat"><span class="sc-stat-val" id="scStreak">0🔥</span><span class="sc-stat-lbl">Day Streak</span></div>
-            <div class="sc-stat"><span class="sc-stat-val" id="scSessions">0</span><span class="sc-stat-lbl">Sessions</span></div>
-            <div class="sc-stat"><span class="sc-stat-val" id="scBreaks">0</span><span class="sc-stat-lbl">Breaks Earned</span></div>
-            <div class="sc-stat"><span class="sc-stat-val" id="scCoins">0🪙</span><span class="sc-stat-lbl">Coins</span></div>
+          <div style="background:linear-gradient(145deg,#1a0a2e 0%,#2d1060 50%,#1a0a2e 100%);border-radius:18px;padding:24px 20px;font-family:'Nunito',sans-serif;border:2px solid rgba(155,89,245,0.6);box-shadow:0 0 30px rgba(155,89,245,0.3)">
+            <!-- Top brand bar -->
+            <div style="font-size:.6rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(155,89,245,.7);margin-bottom:14px;text-align:center">TIME BREAK · STUDY SMARTER</div>
+            <!-- PFP + Name -->
+            <div style="text-align:center;margin-bottom:16px">
+              <div id="scPfp" style="font-size:3.5rem;line-height:1;margin-bottom:8px">😊</div>
+              <div id="scName" style="font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;background:linear-gradient(135deg,#9b59f5,#ff8c42);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">StudyChamp</div>
+            </div>
+            <!-- Stats grid -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+              <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;text-align:center">
+                <div id="scStreak" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#ff8c42">0🔥</div>
+                <div style="font-size:.6rem;font-weight:700;color:rgba(240,232,255,.5);text-transform:uppercase;letter-spacing:1px">Day Streak</div>
+              </div>
+              <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;text-align:center">
+                <div id="scSessions" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#ff8c42">0</div>
+                <div style="font-size:.6rem;font-weight:700;color:rgba(240,232,255,.5);text-transform:uppercase;letter-spacing:1px">Sessions</div>
+              </div>
+              <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;text-align:center">
+                <div id="scBreaks" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#ff8c42">0</div>
+                <div style="font-size:.6rem;font-weight:700;color:rgba(240,232,255,.5);text-transform:uppercase;letter-spacing:1px">Breaks Earned</div>
+              </div>
+              <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;text-align:center">
+                <div id="scCoins" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#ffd700">0🪙</div>
+                <div style="font-size:.6rem;font-weight:700;color:rgba(240,232,255,.5);text-transform:uppercase;letter-spacing:1px">Coins</div>
+              </div>
+            </div>
+            <!-- Bottom bar -->
+            <div style="text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
+              <div style="font-size:.58rem;font-weight:800;color:rgba(155,89,245,.6);letter-spacing:2px;text-transform:uppercase">Study smarter, not harder 🚀</div>
+            </div>
           </div>
-          <div class="sc-brand">TimeBreak · Study Smarter</div>
         </div>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px">
-          <button class="ctrl-btn primary" onclick="shareCard()">📤 Copy Share Text</button>
+          <button class="ctrl-btn primary" id="shareBtn" onclick="shareCard()">📸 Save as Image</button>
           <button class="ctrl-btn secondary" onclick="goTo('shop',false)">🎨 Edit Profile</button>
         </div>
         <h2 style="margin-bottom:12px">💾 Save Code</h2>
@@ -560,16 +583,22 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
   </main>
 </div>
 
-<!-- Share modal -->
+<!-- Share image modal -->
 <div class="modal-overlay" id="shareModal" onclick="closeShareModal(event)">
-  <div class="modal">
-    <h3>📤 Copied!</h3>
-    <p id="shareModalText" style="font-size:.85rem;line-height:1.6"></p>
-    <div class="modal-footer"><button class="ctrl-btn primary" onclick="closeShareModal()">Done ✓</button></div>
+  <div class="modal" style="max-width:420px;text-align:center" onclick="event.stopPropagation()">
+    <h3>📸 Your Share Card</h3>
+    <p style="margin-bottom:12px">Long-press or right-click the image below to save it, then share it anywhere!</p>
+    <img id="shareImg" style="width:100%;border-radius:14px;border:2px solid var(--card-border);margin-bottom:14px;display:block" src="" alt="Share card">
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <a id="shareDownloadLink" class="ctrl-btn primary" download="timebreak-card.png" style="text-decoration:none;display:inline-block">⬇️ Download PNG</a>
+      <button class="ctrl-btn secondary" onclick="closeShareModal()">Close</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 /* ── COOKIES ── */
@@ -1122,23 +1151,38 @@ function updateSaveCode(){
   if(el)el.textContent=genSaveCode();
 }
 function shareCard(){
-  var text=activePfp+' '+username+'\n'
-    +'┌─────────────────────┐\n'
-    +'│  🔥 '+streak+' day streak\n'
-    +'│  📚 '+completedSessions+' sessions done\n'
-    +'│  ☕ '+todayBreaks+' breaks earned\n'
-    +'│  🪙 '+coins+' coins\n'
-    +'└─────────────────────┘\n'
-    +'Studying with TimeBreak 🚀';
-  var show=function(){
-    document.getElementById('shareModalText').textContent=text;
-    document.getElementById('shareModal').classList.add('open');
+  var btn=document.getElementById('shareBtn');
+  if(btn){btn.textContent='⏳ Capturing...';btn.disabled=true}
+  var card=document.getElementById('shareCardPreview');
+  /* Temporarily make the card a fixed pixel size for consistent output */
+  var origStyle=card.getAttribute('style')||'';
+  card.style.width='360px';
+  card.style.maxWidth='360px';
+  var opts={
+    backgroundColor:null,
+    scale:2, /* retina quality */
+    useCORS:true,
+    logging:false,
+    allowTaint:true
   };
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(show).catch(show);
-  }else{show()}
+  html2canvas(card,opts).then(function(canvas){
+    card.setAttribute('style',origStyle);
+    var dataUrl=canvas.toDataURL('image/png');
+    document.getElementById('shareImg').src=dataUrl;
+    document.getElementById('shareDownloadLink').href=dataUrl;
+    document.getElementById('shareModal').classList.add('open');
+    if(btn){btn.textContent='📸 Save as Image';btn.disabled=false}
+  }).catch(function(err){
+    card.setAttribute('style',origStyle);
+    console.error('Screenshot failed:',err);
+    showToast('❌ Screenshot failed — try again');
+    if(btn){btn.textContent='📸 Save as Image';btn.disabled=false}
+  });
 }
-function closeShareModal(e){if(!e||e.target===document.getElementById('shareModal'))document.getElementById('shareModal').classList.remove('open')}
+function closeShareModal(e){
+  if(!e||e.target===document.getElementById('shareModal'))
+    document.getElementById('shareModal').classList.remove('open');
+}
 
 /* ── COINS ── */
 function updateCoinDisplays(){
