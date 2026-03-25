@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Break</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --purple:#6c2eb9;--purple-light:#9b59f5;--purple-dark:#3d1478;
+  --orange:#e8621a;--orange-light:#ff8c42;--orange-dark:#b84a0e;
+  --bg:#1a0a2e;--card:rgba(255,255,255,0.07);--card-border:rgba(255,255,255,0.12);
+  --text:#f0e8ff;--text-muted:rgba(240,232,255,0.55);
+  --glow-purple:0 0 30px rgba(155,89,245,0.4);--glow-orange:0 0 30px rgba(232,98,26,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .6s}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(108,46,185,.45) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(232,98,26,.35) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 60% 30%,rgba(155,89,245,.2) 0%,transparent 50%);pointer-events:none;z-index:0;transition:background .6s}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+/* ── THEMES ── */
+body.theme-galaxy{background:#04000f!important}
+body.theme-galaxy::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(80,0,180,.6) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(0,60,180,.5) 0%,transparent 55%),radial-gradient(ellipse 40% 40% at 50% 50%,rgba(120,0,255,.3) 0%,transparent 50%)!important}
+body.theme-sunset{background:#1a0505!important}
+body.theme-sunset::before{background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(220,60,0,.5) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 90%,rgba(180,20,60,.5) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 50% 50%,rgba(255,120,0,.25) 0%,transparent 50%)!important}
+body.theme-ocean{background:#001a2e!important}
+body.theme-ocean::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(0,100,180,.5) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(0,180,160,.4) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 60% 30%,rgba(0,60,120,.3) 0%,transparent 50%)!important}
+body.theme-forest{background:#051a08!important}
+body.theme-forest::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(20,120,40,.5) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(60,180,40,.35) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 60% 30%,rgba(0,80,20,.3) 0%,transparent 50%)!important}
+body.theme-neon{background:#050510!important}
+body.theme-neon::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(255,0,200,.4) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(0,255,200,.35) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 60% 30%,rgba(255,200,0,.2) 0%,transparent 50%)!important}
+body.theme-myles{background:#020d1a!important}
+body.theme-myles::before{background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(0,100,220,.55) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(0,180,255,.4) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 50% 30%,rgba(80,200,255,.2) 0%,transparent 50%)!important}
+
+.orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.22;pointer-events:none;z-index:0;animation:orbFloat 12s ease-in-out infinite}
+.orb1{width:400px;height:400px;background:var(--purple-light);top:-100px;left:-100px}
+.orb2{width:300px;height:300px;background:var(--orange);bottom:-80px;right:-80px;animation-delay:-6s}
+.orb3{width:200px;height:200px;background:var(--orange-light);top:40%;left:60%;animation-delay:-3s}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.08)}}
+.content{position:relative;z-index:1}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid var(--card-border);backdrop-filter:blur(14px);background:rgba(26,10,46,.78);position:sticky;top:0;z-index:200;gap:10px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.85rem;letter-spacing:3px;background:linear-gradient(135deg,var(--purple-light),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;user-select:none;flex-shrink:0}
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.coin-display{display:flex;align-items:center;gap:5px;background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);border-radius:999px;padding:5px 12px;font-weight:800;font-size:.8rem;color:#ffd700;white-space:nowrap}
+.coin-display span{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px}
+
+/* ── BURGER (always visible) ── */
+.burger{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:38px;height:38px;background:var(--card);border:1px solid var(--card-border);border-radius:10px;cursor:pointer;padding:9px;transition:all .2s;flex-shrink:0}
+.burger:hover{border-color:var(--purple-light);box-shadow:var(--glow-purple)}
+.burger span{display:block;width:100%;height:2px;background:var(--text);border-radius:2px;transition:all .3s cubic-bezier(.4,0,.2,1);transform-origin:center}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ── DRAWER ── */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:250;backdrop-filter:blur(3px)}
+.drawer-overlay.open{display:block}
+.mobile-drawer{display:flex;position:fixed;top:0;right:-100%;width:min(300px,84vw);height:100vh;background:rgba(15,4,30,.98);backdrop-filter:blur(24px);border-left:1px solid var(--card-border);z-index:300;flex-direction:column;transition:right .35s cubic-bezier(.4,0,.2,1);box-shadow:-10px 0 50px rgba(0,0,0,.6)}
+.mobile-drawer.open{right:0}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--card-border)}
+.drawer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;background:linear-gradient(135deg,var(--purple-light),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.drawer-head-right{display:flex;align-items:center;gap:7px}
+.drawer-coins{background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.3);border-radius:999px;padding:4px 11px;font-weight:800;font-size:.76rem;color:#ffd700}
+.drawer-x{width:30px;height:30px;background:var(--card);border:1px solid var(--card-border);border-radius:7px;color:var(--text);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.drawer-x:hover{background:rgba(255,255,255,.12)}
+.drawer-links{display:flex;flex-direction:column;padding:12px;gap:4px;flex:1;overflow-y:auto}
+.dlink{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid transparent;background:transparent;color:var(--text-muted);font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:left;width:100%}
+.dlink-icon{font-size:1.15rem;width:22px;text-align:center;flex-shrink:0}
+.dlink:hover{background:var(--card);color:var(--text);border-color:var(--card-border)}
+.dlink.active{background:linear-gradient(135deg,rgba(108,46,185,.35),rgba(232,98,26,.22));border-color:var(--purple-light);color:var(--text)}
+.dlink-new{margin-left:auto;background:linear-gradient(135deg,var(--purple),var(--orange-dark));color:#fff;font-size:.58rem;padding:2px 6px;border-radius:999px;font-weight:800;flex-shrink:0}
+.drawer-foot{padding:12px 18px;border-top:1px solid var(--card-border);font-size:.68rem;color:var(--text-muted);text-align:center;font-weight:600}
+
+/* ── MAIN ── */
+main{padding:22px 18px;max-width:1160px;margin:0 auto}
+.page{display:none;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:18px;padding:22px;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+h2{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:2px;background:linear-gradient(135deg,var(--purple-light),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.h2-tight{margin-bottom:0!important}
+
+/* ── TIMER PAGE ── */
+.timer-grid{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+@media(max-width:860px){.timer-grid{grid-template-columns:1fr}}
+
+.subject-row{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.subj-btn{flex:1;min-width:70px;padding:10px 5px;border-radius:12px;border:2px solid var(--card-border);background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center}
+.subj-btn:hover{border-color:var(--purple-light);transform:translateY(-2px)}
+.subj-btn.active{background:linear-gradient(135deg,var(--purple),var(--orange-dark));border-color:var(--orange-light);box-shadow:var(--glow-orange)}
+.subj-btn .subj-icon{font-size:1.25rem;display:block;margin-bottom:2px}
+
+.diff-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.diff-btn{flex:1;min-width:58px;padding:8px 4px;border-radius:8px;border:2px solid var(--card-border);background:var(--card);color:var(--text-muted);font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
+.diff-btn.active{background:var(--purple-dark);border-color:var(--purple-light);color:var(--text)}
+.diff-btn:hover{border-color:var(--purple-light)}
+
+/* Sliders */
+.custom-dur{margin-bottom:16px;padding:13px 15px;background:rgba(155,89,245,.07);border:1px solid rgba(155,89,245,.18);border-radius:12px}
+.custom-dur-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.custom-dur-label{font-size:.74rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.custom-dur-vals{display:flex;align-items:center;gap:7px}
+.dur-badge{background:linear-gradient(135deg,var(--purple),var(--orange-dark));color:white;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;padding:2px 10px;border-radius:999px}
+.dur-sep{color:var(--text-muted);font-size:.72rem;font-weight:700}
+.slider-row{display:flex;flex-direction:column;gap:7px}
+.slider-line{display:flex;align-items:center;gap:9px}
+.slider-lbl{font-size:.7rem;font-weight:800;color:var(--text-muted);width:36px;flex-shrink:0}
+.slider-track{flex:1;position:relative;height:20px;display:flex;align-items:center}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:999px;background:rgba(255,255,255,.12);outline:none;cursor:pointer;display:block}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--purple-light),var(--orange-light));border:2px solid rgba(255,255,255,.25);cursor:pointer;box-shadow:0 0 8px rgba(155,89,245,.5)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,var(--purple-light),var(--orange-light));border:2px solid rgba(255,255,255,.25);cursor:pointer;border:none}
+.slider-val{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--orange-light);width:32px;text-align:right;flex-shrink:0}
+
+/* Timer ring */
+.timer-face{display:flex;flex-direction:column;align-items:center;padding:20px 16px 18px}
+.timer-ring-wrap{position:relative;width:210px;height:210px;margin-bottom:16px}
+.timer-ring-wrap svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring-bg{stroke:rgba(255,255,255,.08)}
+.ring-progress{stroke:url(#ringGrad);stroke-linecap:round;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 8px var(--purple-light))}
+.timer-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-digits{font-family:'Bebas Neue',sans-serif;font-size:3.6rem;letter-spacing:4px;line-height:1;background:linear-gradient(135deg,#fff 30%,var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.timer-label{font-size:.68rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange-light);margin-top:3px}
+.timer-session-info{text-align:center;color:var(--text-muted);font-size:.8rem;font-weight:600;margin-bottom:16px}
+.timer-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* Buttons */
+.ctrl-btn{padding:10px 20px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.ctrl-btn.primary{background:linear-gradient(135deg,var(--purple),var(--orange));color:white;box-shadow:var(--glow-purple);min-width:95px}
+.ctrl-btn.primary:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 0 30px rgba(155,89,245,.6)}
+.ctrl-btn.secondary{background:var(--card);color:var(--text-muted);border:1px solid var(--card-border)}
+.ctrl-btn.secondary:hover{color:var(--text);border-color:var(--purple-light)}
+.ctrl-btn.goofy-btn{background:linear-gradient(135deg,#ff6b35,#ffd700);color:#1a0a2e;font-size:.8rem;font-weight:900}
+
+/* Sidebar */
+.sidebar{display:flex;flex-direction:column;gap:14px}
+.session-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.session-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--card-border);font-size:.8rem;font-weight:700}
+.session-item.current{background:linear-gradient(135deg,rgba(108,46,185,.28),rgba(232,98,26,.18));border-color:var(--purple-light)}
+.session-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-box{background:rgba(255,255,255,.04);border:1px solid var(--card-border);border-radius:10px;padding:10px;text-align:center}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;background:linear-gradient(135deg,var(--purple-light),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-lbl{font-size:.62rem;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase}
+
+/* ── STUDY QUESTIONS (on timer screen) ── */
+.study-panel{margin-top:0}
+.study-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.stab{padding:5px 12px;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(155,89,245,.1);border:1px solid var(--card-border);color:var(--text-muted);cursor:pointer;transition:all .2s}
+.stab:hover,.stab.active{background:var(--purple-dark);border-color:var(--purple-light);color:white}
+.study-topic-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.stopik{padding:3px 10px;border-radius:999px;font-size:.66rem;font-weight:700;background:rgba(255,255,255,.05);border:1px solid var(--card-border);color:var(--text-muted);cursor:pointer;transition:all .2s}
+.stopik:hover,.stopik.active{background:rgba(232,98,26,.2);border-color:var(--orange-light);color:var(--orange-light)}
+.sq-progress{height:4px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden;margin-bottom:10px}
+.sq-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple-light),var(--orange-light));border-radius:999px;transition:width .4s}
+.sq-scores{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.sq-badge{padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:800;border:1px solid}
+.sq-badge.c{background:rgba(76,175,80,.1);border-color:#4caf50;color:#7ddb7d}
+.sq-badge.w{background:rgba(244,67,54,.1);border-color:#f44336;color:#f07070}
+.sq-badge.l{background:rgba(255,255,255,.04);border-color:var(--card-border);color:var(--text-muted)}
+.sq-card{background:rgba(255,255,255,.04);border:1px solid var(--card-border);border-radius:13px;padding:16px}
+.sq-num{font-size:.64rem;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.sq-q{font-weight:800;font-size:.92rem;line-height:1.4;margin-bottom:12px}
+.sq-opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.sq-opt{padding:8px 11px;border-radius:9px;border:2px solid var(--card-border);background:rgba(255,255,255,.03);color:var(--text-muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .16s;text-align:left}
+.sq-opt:hover:not(:disabled){border-color:var(--purple-light);color:var(--text);background:rgba(108,46,185,.14)}
+.sq-opt:disabled{cursor:default}
+.sq-opt.sq-correct{border-color:#4caf50;background:rgba(76,175,80,.14);color:#7ddb7d}
+.sq-opt.sq-wrong{border-color:#f44336;background:rgba(244,67,54,.1);color:#f07070}
+.sq-opt.sq-show-correct{border-color:#4caf50;background:rgba(76,175,80,.08);color:#7ddb7d}
+.sq-explain{display:none;background:rgba(155,89,245,.08);border:1px solid rgba(155,89,245,.2);border-radius:8px;padding:9px 12px;font-size:.78rem;line-height:1.5;color:var(--text-muted);margin-top:8px}
+.sq-explain.show{display:block}
+.sq-explain strong{color:var(--purple-light)}
+.sq-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.sq-hint{background:none;border:1px solid var(--card-border);border-radius:7px;color:var(--text-muted);font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:700;padding:4px 10px;cursor:pointer;transition:all .2s}
+.sq-hint:hover{border-color:var(--purple-light);color:var(--text)}
+.sq-nav{display:flex;gap:6px;margin-top:10px;justify-content:space-between;align-items:center}
+.sq-empty{text-align:center;padding:30px 10px;color:var(--text-muted)}
+.sq-empty .sq-emoji{font-size:2.4rem;margin-bottom:8px}
+.sq-result{background:linear-gradient(135deg,rgba(108,46,185,.22),rgba(232,98,26,.18));border:1px solid var(--orange-light);border-radius:13px;padding:18px;text-align:center;margin-bottom:12px}
+.sq-result h4{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:linear-gradient(135deg,#ffd700,#ff8c42);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.sq-result p{color:var(--text-muted);font-size:.82rem;margin-bottom:10px}
+.sq-stars{font-size:1.5rem;margin-bottom:6px}
+.sq-result-btns{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+
+/* ── PUZZLES ── */
+.puzzle-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.puzzle-header h2{margin-bottom:0}
+.puzzle-date-badge{background:linear-gradient(135deg,var(--purple),var(--orange-dark));color:white;padding:5px 13px;border-radius:999px;font-size:.73rem;font-weight:800}
+.rss-feed{display:flex;flex-direction:column;gap:10px}
+.puzzle-card{padding:15px 19px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid var(--card-border);cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.puzzle-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(to bottom,var(--purple-light),var(--orange-light));border-radius:4px 0 0 4px}
+.puzzle-card:hover{border-color:var(--purple-light);transform:translateX(4px)}
+.puzzle-card.featured{background:linear-gradient(135deg,rgba(108,46,185,.18),rgba(232,98,26,.13));border-color:var(--orange-light)}
+.puzzle-title{font-weight:800;font-size:.92rem;margin-bottom:4px}
+.puzzle-meta{font-size:.7rem;color:var(--text-muted);font-weight:600}
+.puzzle-tag{display:inline-block;background:rgba(155,89,245,.22);border:1px solid var(--purple-light);color:var(--purple-light);font-size:.63rem;font-weight:700;padding:2px 7px;border-radius:999px;margin-right:4px;margin-top:5px}
+.puzzle-tag.orange{background:rgba(232,98,26,.22);border-color:var(--orange-light);color:var(--orange-light)}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px}
+.tag{padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(155,89,245,.1);border:1px solid var(--card-border);color:var(--text-muted);cursor:pointer;transition:all .2s}
+.tag:hover,.tag.active{background:var(--purple);border-color:var(--purple-light);color:white}
+
+/* ── CHALLENGES / RSS ── */
+.chal-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.chal-header h2{margin-bottom:0}
+.chal-date-badge{background:linear-gradient(135deg,var(--purple),var(--orange-dark));color:white;padding:5px 13px;border-radius:999px;font-size:.73rem;font-weight:800;white-space:nowrap}
+.chal-mode-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.chal-mode-btn{padding:5px 14px;border-radius:999px;font-size:.73rem;font-weight:700;background:rgba(255,255,255,.05);border:1px solid var(--card-border);color:var(--text-muted);cursor:pointer;transition:all .2s}
+.chal-mode-btn:hover,.chal-mode-btn.active{background:var(--purple-dark);border-color:var(--purple-light);color:white}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px}
+.tag{padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(155,89,245,.1);border:1px solid var(--card-border);color:var(--text-muted);cursor:pointer;transition:all .2s}
+.tag:hover,.tag.active{background:var(--purple);border-color:var(--purple-light);color:white}
+.chal-feed{display:flex;flex-direction:column;gap:11px}
+.chal-card{padding:16px 20px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--card-border);cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.chal-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+.chal-card.diff-easy::before{background:#4caf50}
+.chal-card.diff-medium::before{background:#ff9800}
+.chal-card.diff-hard::before{background:#f44336}
+.chal-card.diff-challenge::before{background:linear-gradient(to bottom,var(--purple-light),var(--orange-light))}
+.chal-card:hover{border-color:var(--purple-light);transform:translateX(5px)}
+.chal-card.featured{background:linear-gradient(135deg,rgba(108,46,185,.18),rgba(232,98,26,.13));border-color:var(--orange-light)}
+.chal-title-row{display:flex;align-items:center;gap:10px;margin-bottom:5px;flex-wrap:wrap}
+.chal-title{font-weight:800;font-size:.95rem}
+.chal-tag{display:inline-block;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:999px;border:1px solid}
+.chal-tag.subj-maths{background:rgba(108,46,185,.2);border-color:var(--purple-light);color:var(--purple-light)}
+.chal-tag.subj-science{background:rgba(0,150,180,.2);border-color:#00c8ff;color:#00c8ff}
+.chal-tag.subj-english{background:rgba(232,98,26,.2);border-color:var(--orange-light);color:var(--orange-light)}
+.chal-tag.subj-logic{background:rgba(76,175,80,.2);border-color:#4caf50;color:#4caf50}
+.chal-tag.diff-easy{background:rgba(76,175,80,.15);border-color:#4caf50;color:#7ddb7d}
+.chal-tag.diff-medium{background:rgba(255,152,0,.15);border-color:#ff9800;color:#ffb74d}
+.chal-tag.diff-hard{background:rgba(244,67,54,.15);border-color:#f44336;color:#f07070}
+.chal-tag.diff-challenge{background:rgba(155,89,245,.2);border-color:var(--purple-light);color:var(--purple-light)}
+.chal-meta{font-size:.7rem;color:var(--text-muted);font-weight:600;margin-bottom:4px}
+.chal-desc{font-size:.82rem;color:var(--text-muted);line-height:1.4;margin-bottom:8px}
+.chal-source{font-size:.65rem;color:rgba(240,232,255,.3);font-weight:600}
+.chal-source a{color:rgba(155,89,245,.6);text-decoration:none}
+.chal-source a:hover{color:var(--purple-light)}
+/* Single challenge view */
+.chal-detail{animation:fadeIn .3s ease}
+.chal-detail-back{background:none;border:1px solid var(--card-border);border-radius:8px;color:var(--text-muted);font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;padding:5px 12px;cursor:pointer;transition:all .2s;margin-bottom:16px;display:inline-flex;align-items:center;gap:5px}
+.chal-detail-back:hover{border-color:var(--purple-light);color:var(--text)}
+.chal-detail-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;background:linear-gradient(135deg,var(--purple-light),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.chal-detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chal-detail-body{background:rgba(255,255,255,.04);border:1px solid var(--card-border);border-radius:13px;padding:18px;margin-bottom:14px;font-size:.92rem;line-height:1.65}
+.chal-detail-question{font-weight:800;font-size:1rem;margin-bottom:12px;color:var(--text)}
+.chal-detail-hints{background:rgba(155,89,245,.07);border:1px solid rgba(155,89,245,.2);border-radius:10px;padding:12px 15px;margin-bottom:12px;font-size:.82rem;color:var(--text-muted);line-height:1.5;display:none}
+.chal-detail-hints.show{display:block}
+.chal-detail-hints strong{color:var(--purple-light)}
+.chal-answer-area{margin-bottom:12px}
+.chal-answer-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--card-border);border-radius:10px;color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;padding:11px 14px;outline:none;transition:border-color .2s}
+.chal-answer-input:focus{border-color:var(--purple-light)}
+.chal-answer-fb{height:22px;font-weight:700;font-size:.88rem;margin-top:7px}
+.chal-detail-footer{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.chal-source-attr{font-size:.68rem;color:rgba(240,232,255,.3);font-weight:600}
+.chal-source-attr a{color:rgba(155,89,245,.55);text-decoration:none}
+.chal-source-attr a:hover{color:var(--purple-light);text-decoration:underline}
+.chal-url-info{background:rgba(255,255,255,.04);border:1px solid var(--card-border);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.chal-url-info code{background:rgba(155,89,245,.15);border-radius:5px;padding:2px 7px;font-family:monospace;font-size:.78rem;color:var(--purple-light)}
+
+/* ── REMINDERS ── */
+.notif-banner{display:flex;align-items:center;gap:11px;padding:12px 15px;background:linear-gradient(135deg,rgba(108,46,185,.22),rgba(232,98,26,.18));border:1px solid var(--orange-light);border-radius:12px;margin-bottom:16px;flex-wrap:wrap}
+.notif-banner-icon{font-size:1.3rem;flex-shrink:0}
+.notif-banner-text{flex:1;min-width:100px;font-size:.82rem;font-weight:700}
+.notif-banner-text span{display:block;font-size:.7rem;color:var(--text-muted);font-weight:600;margin-top:2px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--card-border)}
+.toggle-row:last-of-type{border-bottom:none}
+.toggle-label{font-weight:700;font-size:.9rem}
+.toggle-desc{font-size:.7rem;color:var(--text-muted);margin-top:2px}
+.toggle-switch{position:relative;width:45px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:999px;cursor:pointer;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
+.toggle-switch input:checked+.toggle-slider{background:linear-gradient(135deg,var(--purple),var(--orange))}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(21px)}
+.interval-input{display:flex;align-items:center;gap:9px;padding:12px 0;border-bottom:1px solid var(--card-border)}
+.interval-input label{flex:1;font-weight:700;font-size:.9rem}
+.num-input{width:60px;background:rgba(255,255,255,.06);border:1px solid var(--card-border);border-radius:8px;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;font-size:.92rem;padding:5px 8px;text-align:center;outline:none}
+.num-input:focus{border-color:var(--purple-light)}
+.unit-label{color:var(--text-muted);font-size:.8rem;font-weight:600}
+.divider{height:1px;background:var(--card-border);margin:13px 0}
+
+/* ── RACE ── */
+.race-hud{display:flex;gap:9px;justify-content:center;margin-bottom:13px;flex-wrap:wrap}
+.hud-item{background:rgba(255,255,255,.06);border:1px solid var(--card-border);border-radius:9px;padding:6px 13px;font-weight:800;font-size:.8rem;display:flex;align-items:center;gap:5px}
+.hud-item span{color:var(--orange-light);font-family:'Bebas Neue',sans-serif;font-size:1.05rem}
+.track-wrap{position:relative;height:130px;background:linear-gradient(180deg,#071320 0%,#0d1f14 60%,#142a1a 100%);border-radius:15px;border:2px solid rgba(255,255,255,.1);overflow:hidden;margin-bottom:9px}
+.track-wrap::before{content:'✦  ·  ✦  ·  ✦  ·  ✦  ·  ✦';position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:.48rem;color:rgba(255,255,255,.22);letter-spacing:8px;white-space:nowrap;pointer-events:none;z-index:1}
+.road-surface{position:absolute;bottom:0;left:0;right:0;height:52px;background:#2a2a2a;border-top:3px solid #555;overflow:hidden}
+.road-surface::after{content:'';position:absolute;top:50%;left:0;right:0;height:4px;transform:translateY(-50%);background:repeating-linear-gradient(90deg,#fff 0,#fff 44px,transparent 44px,transparent 76px)}
+.finish-line{position:absolute;bottom:0;right:30px;width:13px;height:52px;background:repeating-linear-gradient(180deg,#fff 0,#fff 6px,#000 6px,#000 12px);opacity:.9;z-index:2}
+.finish-flag{position:absolute;bottom:52px;right:24px;font-size:1rem;z-index:2;line-height:1}
+.race-car{position:absolute;bottom:26px;font-size:1.9rem;transition:left .55s cubic-bezier(.4,0,.2,1);z-index:5;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5))}
+.race-car.shake{animation:carShake .35s ease}
+@keyframes carShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg) translateX(-4px)}40%{transform:rotate(8deg) translateX(4px)}60%{transform:rotate(-6deg) translateX(-3px)}80%{transform:rotate(4deg) translateX(2px)}}
+.race-progress-bar{height:5px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden;margin-bottom:13px}
+.race-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple-light),var(--orange-light));border-radius:999px;transition:width .55s cubic-bezier(.4,0,.2,1)}
+.question-bubble{background:rgba(255,255,255,.07);border:2px solid var(--purple-light);border-radius:13px;padding:12px 16px;margin-bottom:11px;font-weight:700;font-size:.95rem;text-align:center;min-height:50px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+.answer-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:13px}
+.ans-btn{padding:8px 15px;border-radius:9px;border:2px solid var(--card-border);background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;font-weight:800;font-size:.86rem;cursor:pointer;transition:all .15s;min-width:66px}
+.ans-btn:hover:not(:disabled){background:var(--purple-dark);border-color:var(--purple-light);transform:scale(1.05)}
+.ans-btn:disabled{cursor:not-allowed;opacity:.7}
+.ans-btn.correct{background:#1a4d1a;border-color:#4caf50;color:#6ddb6d}
+.ans-btn.wrong{background:#4d1a1a;border-color:#f44336;color:#f07070}
+.race-footer{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+.lap-banner{display:none;position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:20;align-items:center;justify-content:center;flex-direction:column;gap:7px;border-radius:13px;text-align:center;padding:18px}
+.lap-banner.show{display:flex;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+.lap-banner h3{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;background:linear-gradient(135deg,#ffd700,#ff8c42);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lap-banner p{color:var(--text-muted);font-size:.85rem;font-weight:700}
+
+/* ── SHOP ── */
+.shop-header-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.shop-header-row h2{margin-bottom:0}
+.shop-balance{display:flex;align-items:center;gap:7px;background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);border-radius:999px;padding:7px 16px;font-weight:800;font-size:.9rem;color:#ffd700}
+.shop-balance span{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:13px}
+.shop-item{background:rgba(255,255,255,.05);border:2px solid var(--card-border);border-radius:15px;padding:16px 13px;text-align:center;transition:all .25s;position:relative;overflow:hidden}
+.shop-item:hover{border-color:var(--purple-light);transform:translateY(-3px);box-shadow:var(--glow-purple)}
+.shop-item.owned{border-color:#4caf50;background:rgba(76,175,80,.07)}
+.shop-item.active-theme{border-color:#ffd700;background:rgba(255,215,0,.07);box-shadow:0 0 18px rgba(255,215,0,.18)}
+.shop-preview{width:100%;height:65px;border-radius:9px;margin-bottom:11px}
+.shop-item-name{font-weight:800;font-size:.9rem;margin-bottom:3px}
+.shop-item-desc{font-size:.7rem;color:var(--text-muted);font-weight:600;margin-bottom:11px;line-height:1.4}
+.shop-btn{width:100%;padding:8px;border-radius:8px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.78rem;cursor:pointer;transition:all .2s}
+.shop-btn.buy{background:linear-gradient(135deg,var(--purple),var(--orange));color:white}
+.shop-btn.buy:hover{transform:scale(1.03);box-shadow:var(--glow-orange)}
+.shop-btn.buy:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.shop-btn.equip{background:linear-gradient(135deg,#1a6b1a,#2ea82e);color:white}
+.shop-btn.equip:hover{transform:scale(1.03)}
+.shop-btn.equipped{background:linear-gradient(135deg,#b8860b,#ffd700);color:#1a0a2e;cursor:default}
+.owned-badge{position:absolute;top:7px;right:7px;background:#4caf50;color:white;font-size:.56rem;font-weight:800;padding:2px 6px;border-radius:999px}
+.active-badge{position:absolute;top:7px;right:7px;background:#ffd700;color:#1a0a2e;font-size:.56rem;font-weight:800;padding:2px 6px;border-radius:999px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#1c0a34;border:1px solid var(--card-border);border-radius:20px;padding:24px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5),var(--glow-purple)}
+.modal-overlay.open .modal{animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:8px;color:var(--orange-light)}
+.modal p{color:var(--text-muted);line-height:1.55;margin-bottom:12px;font-size:.88rem}
+.modal-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--card-border);border-radius:9px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.92rem;padding:9px 13px;margin-bottom:8px;outline:none;transition:border-color .2s}
+.modal-input:focus{border-color:var(--purple-light)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:linear-gradient(135deg,var(--purple),var(--orange));color:white;padding:10px 20px;border-radius:999px;font-weight:800;font-size:.82rem;z-index:999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:90vw;text-align:center;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  header{padding:9px 13px}
+  main{padding:12px 10px}
+  .card{padding:15px 12px}
+  .timer-ring-wrap{width:185px;height:185px}
+  .timer-digits{font-size:3rem}
+  .shop-grid{grid-template-columns:1fr 1fr;gap:9px}
+  .sq-opts{grid-template-columns:1fr}
+}
+@media(max-width:380px){
+  .diff-row{gap:4px}
+  .diff-btn{min-width:50px;font-size:.64rem;padding:7px 2px}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-head">
+    <div class="drawer-logo">TimeBreak</div>
+    <div class="drawer-head-right">
+      <div class="drawer-coins">🪙 <span id="drawerCoins">0</span></div>
+      <button class="drawer-x" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="drawer-links">
+    <button class="dlink active" id="dl-timer" onclick="goTo('timer',true)"><span class="dlink-icon">⏱</span>Timer</button>
+    <button class="dlink" id="dl-puzzle" onclick="goTo('puzzle',true)"><span class="dlink-icon">🧩</span>Daily Challenges<span class="dlink-new">NEW</span></button>
+    <button class="dlink" id="dl-notifs" onclick="goTo('notifs',true)"><span class="dlink-icon">🔔</span>Reminders</button>
+    <button class="dlink" id="dl-racing" onclick="goTo('racing',true)"><span class="dlink-icon">🏎</span>Goofy Race Mode</button>
+    <button class="dlink" id="dl-shop" onclick="goTo('shop',true)"><span class="dlink-icon">🛒</span>Theme Shop</button>
+  </div>
+  <div class="drawer-foot">Time Break · Study smarter 🚀</div>
+</div>
+
+<div class="content">
+  <header>
+    <div class="logo">TimeBreak</div>
+    <div class="header-right">
+      <div class="coin-display">🪙 <span id="headerCoins">0</span></div>
+      <button class="burger" id="burgerBtn" onclick="toggleDrawer()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===== TIMER PAGE ===== -->
+    <div id="page-timer" class="page active">
+      <div class="timer-grid">
+
+        <!-- LEFT COLUMN -->
+        <div>
+          <!-- Setup card -->
+          <div class="card">
+            <h2>📚 Study Session</h2>
+            <div class="subject-row">
+              <button class="subj-btn active" onclick="setSubject('Maths',this)"><span class="subj-icon">🔢</span>Maths</button>
+              <button class="subj-btn" onclick="setSubject('Science',this)"><span class="subj-icon">🔬</span>Science</button>
+              <button class="subj-btn" onclick="setSubject('English',this)"><span class="subj-icon">📖</span>English</button>
+            </div>
+            <div class="diff-row">
+              <button class="diff-btn active" id="diff-easy" onclick="setDiff('easy',this,25,5)">🟢 Easy<br><small>25/5min</small></button>
+              <button class="diff-btn" id="diff-medium" onclick="setDiff('medium',this,35,7)">🟡 Medium<br><small>35/7min</small></button>
+              <button class="diff-btn" id="diff-hard" onclick="setDiff('hard',this,50,10)">🔴 Hard<br><small>50/10min</small></button>
+              <button class="diff-btn" id="diff-exam" onclick="setDiff('exam',this,60,5)">💀 Exam<br><small>60/5min</small></button>
+            </div>
+            <!-- Sliders -->
+            <div class="custom-dur">
+              <div class="custom-dur-top">
+                <span class="custom-dur-label">⚙️ Custom</span>
+                <div class="custom-dur-vals">
+                  <span class="dur-badge" id="studyBadge">25m</span>
+                  <span class="dur-sep">study /</span>
+                  <span class="dur-badge" id="breakBadge">5m</span>
+                  <span class="dur-sep">break</span>
+                </div>
+              </div>
+              <div class="slider-row">
+                <div class="slider-line">
+                  <span class="slider-lbl">Study</span>
+                  <div class="slider-track"><input type="range" id="studySlider" min="5" max="90" value="25"></div>
+                  <span class="slider-val" id="studySliderVal">25m</span>
+                </div>
+                <div class="slider-line">
+                  <span class="slider-lbl">Break</span>
+                  <div class="slider-track"><input type="range" id="breakSlider" min="1" max="30" value="5"></div>
+                  <span class="slider-val" id="breakSliderVal">5m</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timer ring card -->
+          <div class="card" style="margin-top:14px">
+            <div class="timer-face">
+              <div class="timer-ring-wrap">
+                <svg viewBox="0 0 210 210" width="210" height="210">
+                  <defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#9b59f5"/><stop offset="100%" stop-color="#ff8c42"/></linearGradient></defs>
+                  <circle class="ring-bg" cx="105" cy="105" r="93" fill="none" stroke-width="9"/>
+                  <circle id="ringProgress" class="ring-progress" cx="105" cy="105" r="93" fill="none" stroke-width="9" stroke-dasharray="584.3" stroke-dashoffset="0"/>
+                </svg>
+                <div class="timer-inner">
+                  <div class="timer-digits" id="timerDisplay">25:00</div>
+                  <div class="timer-label" id="timerLabel">STUDY TIME</div>
+                </div>
+              </div>
+              <div class="timer-session-info" id="sessionInfo">Session 1 of 4 · Maths · Easy</div>
+              <div class="timer-controls">
+                <button class="ctrl-btn primary" id="startStopBtn" onclick="toggleTimer()">▶ START</button>
+                <button class="ctrl-btn secondary" onclick="resetTimer()">↺ Reset</button>
+                <button class="ctrl-btn goofy-btn" onclick="goTo('racing',false)">🏎 Race!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="sidebar">
+          <!-- Study Questions Panel -->
+          <div class="card">
+            <h2 style="margin-bottom:12px">📖 Study Questions</h2>
+            <div id="studyPanel">
+              <div class="study-tabs" id="studyTabs"></div>
+              <div class="study-topic-row" id="studyTopicRow"></div>
+              <div class="sq-scores" id="sqScores" style="display:none">
+                <span class="sq-badge c">✓ <span id="sqCorrect">0</span></span>
+                <span class="sq-badge w">✗ <span id="sqWrong">0</span></span>
+                <span class="sq-badge l">🎯 <span id="sqLeft">0</span> left</span>
+              </div>
+              <div class="sq-progress" id="sqProgressBar" style="display:none"><div class="sq-progress-fill" id="sqProgressFill" style="width:0%"></div></div>
+              <div id="sqCardArea">
+                <div class="sq-empty"><div class="sq-emoji">📚</div><div style="font-weight:700;font-size:.85rem">Pick a subject tab above, then choose a topic to start!</div></div>
+              </div>
+              <div class="sq-nav" id="sqNav" style="display:none">
+                <button class="ctrl-btn secondary" style="padding:7px 14px;font-size:.8rem" onclick="sqPrev()">← Prev</button>
+                <span style="font-size:.75rem;color:var(--text-muted);font-weight:700" id="sqCounter">1/6</span>
+                <button class="ctrl-btn primary" style="padding:7px 14px;font-size:.8rem" onclick="sqNext()">Next →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Schedule -->
+          <div class="card"><h2 style="margin-bottom:11px">📋 Schedule</h2><ul class="session-list" id="sessionList"></ul></div>
+
+          <!-- Stats -->
+          <div class="card">
+            <h2>📊 Today</h2>
+            <div class="stats-grid">
+              <div class="stat-box"><div class="stat-val" id="statSessions">0</div><div class="stat-lbl">Sessions</div></div>
+              <div class="stat-box"><div class="stat-val" id="statMinutes">0</div><div class="stat-lbl">Minutes</div></div>
+              <div class="stat-box"><div class="stat-val" id="statBreaks">0</div><div class="stat-lbl">Breaks</div></div>
+              <div class="stat-box"><div class="stat-val" id="statStreak">0🔥</div><div class="stat-lbl">Streak</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CHALLENGES / RSS PAGE ===== -->
+    <div id="page-puzzle" class="page">
+      <div class="card" id="chalListView">
+        <div class="chal-header">
+          <h2>🧩 Daily Challenges</h2>
+          <div class="chal-date-badge" id="chalDateBadge"></div>
+        </div>
+        <!-- URL info -->
+        <div class="chal-url-info">
+          🔗 Direct links: <code id="chalUrlToday">/challenges/DATE</code> for today's puzzle · <code>/challenges</code> for full catalog
+        </div>
+        <!-- View toggle -->
+        <div class="chal-mode-btns">
+          <button class="chal-mode-btn active" id="modeBtnToday" onclick="setChalMode('today',this)">📅 Today's Challenge</button>
+          <button class="chal-mode-btn" id="modeBtnAll" onclick="setChalMode('all',this)">📚 Full Catalog</button>
+        </div>
+        <!-- Subject filter -->
+        <div class="tag-row" id="chalTagRow">
+          <span class="tag active" onclick="filterChals('all',this)">All</span>
+          <span class="tag" onclick="filterChals('maths',this)">🔢 Maths</span>
+          <span class="tag" onclick="filterChals('science',this)">🔬 Science</span>
+          <span class="tag" onclick="filterChals('english',this)">📖 English</span>
+          <span class="tag" onclick="filterChals('logic',this)">🧠 Logic</span>
+        </div>
+        <div class="chal-feed" id="chalFeed"></div>
+      </div>
+      <!-- Single challenge detail view -->
+      <div class="card chal-detail" id="chalDetailView" style="display:none">
+        <button class="chal-detail-back" onclick="backToChalList()">← Back to Challenges</button>
+        <div class="chal-detail-title" id="cdTitle"></div>
+        <div class="chal-detail-tags" id="cdTags"></div>
+        <div class="chal-detail-body">
+          <div id="cdContext" style="color:var(--text-muted);font-size:.88rem;line-height:1.6;margin-bottom:12px"></div>
+          <div class="chal-detail-question" id="cdQuestion"></div>
+        </div>
+        <div class="chal-detail-hints" id="cdHints"></div>
+        <div class="chal-answer-area">
+          <input type="text" class="chal-answer-input" id="cdAnswer" placeholder="Your answer…" onkeydown="if(event.key==='Enter')checkChalAnswer()">
+          <div class="chal-answer-fb" id="cdFeedback"></div>
+        </div>
+        <div class="chal-detail-footer">
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            <button class="ctrl-btn secondary" style="padding:8px 14px;font-size:.8rem" onclick="toggleChalHint()">💡 Hint</button>
+            <button class="ctrl-btn primary" style="padding:8px 16px;font-size:.8rem" onclick="checkChalAnswer()">Submit ✓</button>
+          </div>
+          <div class="chal-source-attr" id="cdSource"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REMINDERS PAGE ===== -->
+    <div id="page-notifs" class="page">
+      <div class="card" style="max-width:580px;margin:0 auto">
+        <h2>🔔 Reminders</h2>
+        <div class="notif-banner" id="notifBanner">
+          <span class="notif-banner-icon">📣</span>
+          <div class="notif-banner-text">Enable browser notifications<span>Get pinged when sessions start/end, even in the background</span></div>
+          <button class="ctrl-btn primary" style="padding:8px 12px;font-size:.76rem;flex-shrink:0" onclick="requestNotifPermission()">Enable</button>
+        </div>
+        <div class="toggle-row"><div><div class="toggle-label">📢 Session Start</div><div class="toggle-desc">Notify when a study session begins</div></div><label class="toggle-switch"><input type="checkbox" checked><div class="toggle-slider"></div></label></div>
+        <div class="toggle-row"><div><div class="toggle-label">🎉 Break Time!</div><div class="toggle-desc">Ping when it's time for a break</div></div><label class="toggle-switch"><input type="checkbox" checked><div class="toggle-slider"></div></label></div>
+        <div class="toggle-row"><div><div class="toggle-label">⏰ Daily Reminder</div><div class="toggle-desc">Remind you to start studying each day</div></div><label class="toggle-switch"><input type="checkbox"><div class="toggle-slider"></div></label></div>
+        <div class="toggle-row"><div><div class="toggle-label">🧩 Daily Puzzle</div><div class="toggle-desc">Alert when today's puzzle is ready</div></div><label class="toggle-switch"><input type="checkbox" checked><div class="toggle-slider"></div></label></div>
+        <div class="toggle-row"><div><div class="toggle-label">🔥 Streak Warning</div><div class="toggle-desc">Don't break your study streak!</div></div><label class="toggle-switch"><input type="checkbox" checked><div class="toggle-slider"></div></label></div>
+        <div class="divider"></div>
+        <div class="interval-input"><label>Study session duration</label><input type="number" class="num-input" id="studyMinutes" value="25" min="5" max="120"><span class="unit-label">min</span></div>
+        <div class="interval-input" style="border-bottom:none"><label>Break duration</label><input type="number" class="num-input" id="breakMinutes" value="5" min="1" max="60"><span class="unit-label">min</span></div>
+        <div style="margin-top:16px"><button class="ctrl-btn primary" onclick="saveReminders()">💾 Save Settings</button></div>
+      </div>
+    </div>
+
+    <!-- ===== RACING MODE ===== -->
+    <div id="page-racing" class="page">
+      <div class="card">
+        <h2>🏎 GOOFY RACE MODE</h2>
+        <p style="color:var(--text-muted);margin-bottom:13px;font-size:.83rem">Answer correctly to zoom forward — wrong pushes you <b style="color:#f07070">backwards</b>! Reach the finish for <b style="color:#ffd700">+50 coins</b>! 🏁</p>
+        <div class="race-hud">
+          <div class="hud-item">🏅 Score <span id="raceScore">0</span></div>
+          <div class="hud-item">🔥 Streak <span id="raceStreak">0</span></div>
+          <div class="hud-item">🪙 Coins <span id="raceTotalCoins">0</span></div>
+        </div>
+        <div class="track-wrap">
+          <div class="road-surface"></div>
+          <div class="finish-line"></div>
+          <div class="finish-flag">🏁</div>
+          <div class="race-car" id="raceCar" style="left:5%">🚗</div>
+          <div class="lap-banner" id="lapBanner">
+            <h3>🏁 LAP COMPLETE!</h3>
+            <p id="lapBannerMsg">+50 coins earned!</p>
+            <button class="ctrl-btn primary" onclick="startNextLap()" style="margin-top:5px">Next Lap ▶</button>
+          </div>
+        </div>
+        <div class="race-progress-bar"><div class="race-progress-fill" id="raceProgressFill" style="width:5%"></div></div>
+        <div class="question-bubble" id="raceQuestion">Press Start Race to begin!</div>
+        <div class="answer-row" id="raceAnswers"></div>
+        <div class="race-footer">
+          <button class="ctrl-btn secondary" onclick="goTo('timer',false)">← Back</button>
+          <button class="ctrl-btn primary" id="raceStartBtn" onclick="startRace()">▶ Start Race</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SHOP PAGE ===== -->
+    <div id="page-shop" class="page">
+      <div class="card">
+        <div class="shop-header-row">
+          <h2>🛒 Theme Shop</h2>
+          <div class="shop-balance">🪙 <span id="shopCoins">0</span> coins</div>
+        </div>
+        <p style="color:var(--text-muted);font-size:.83rem;margin-bottom:18px">Buy background themes with your race coins. Earn coins by finishing laps in Goofy Race Mode!</p>
+        <div class="shop-grid" id="shopGrid"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Puzzle Modal -->
+<div class="modal-overlay" id="puzzleModal" onclick="closePuzzleModal(event)">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalDesc"></p>
+    <p style="color:var(--text-muted);font-size:.78rem;margin-bottom:8px" id="modalQ"></p>
+    <input type="text" class="modal-input" id="modalAnswer" placeholder="Your answer..." onkeydown="if(event.key==='Enter')checkPuzzleAnswer()">
+    <div id="modalFeedback" style="height:20px;font-weight:700;font-size:.83rem;margin-bottom:3px"></div>
+    <div class="modal-footer">
+      <button class="ctrl-btn secondary" onclick="closePuzzleModal()">Close</button>
+      <button class="ctrl-btn primary" onclick="checkPuzzleAnswer()">Submit ✓</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── COOKIES ── */
+function setCookie(n,v,d){var x=new Date();x.setTime(x.getTime()+d*86400000);document.cookie=n+'='+encodeURIComponent(JSON.stringify(v))+';expires='+x.toUTCString()+';path=/'}
+function getCookie(n){var p=n+'=',ca=document.cookie.split(';');for(var i=0;i<ca.length;i++){var c=ca[i].trim();if(c.indexOf(p)===0){try{return JSON.parse(decodeURIComponent(c.substring(p.length)))}catch(e){return null}}}return null}
+function saveData(){setCookie('tbCoins',coins,365);setCookie('tbOwned',ownedThemes,365);setCookie('tbTheme',activeTheme,365);setCookie('tbStats',{sessions:completedSessions,minutes:todayMinutes,breaks:todayBreaks,streak:streak},365)}
+function loadData(){var c=getCookie('tbCoins');if(c!==null)coins=c;var o=getCookie('tbOwned');if(o!==null)ownedThemes=o;var t=getCookie('tbTheme');if(t!==null)activeTheme=t;var s=getCookie('tbStats');if(s){completedSessions=s.sessions||0;todayMinutes=s.minutes||0;todayBreaks=s.breaks||0;streak=s.streak||0}}
+
+/* ── STATE ── */
+var timerRunning=false,timerInterval=null,isBreak=false;
+var studyMin=25,breakMin=5,totalSeconds=1500,secondsLeft=1500,breakSeconds=300;
+var completedSessions=0,totalSessions=4,todayMinutes=0,todayBreaks=0,streak=0;
+var currentSubject='Maths',currentDiff='easy';
+var currentPuzzleAnswer='',puzzleFilter='all';
+var raceActive=false,carPosition=5,raceScore=0,raceStreakCount=0,currentRaceQ=null,raceAwaitingAnswer=false;
+var coins=0,ownedThemes=['default','myles'],activeTheme='default';
+
+/* study state */
+var sqSubject='Maths',sqTopic=null,sqQs=[],sqIdx=0,sqAnswered=[],sqCorrect=0,sqWrong=0;
+
+loadData();
+/* ensure myles is always owned */
+if(ownedThemes.indexOf('myles')===-1)ownedThemes.push('myles');
+
+/* ── DRAWER ── */
+function toggleDrawer(){document.getElementById('mobileDrawer').classList.contains('open')?closeDrawer():openDrawer()}
+function openDrawer(){document.getElementById('mobileDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');document.getElementById('burgerBtn').classList.add('open');document.body.style.overflow='hidden'}
+function closeDrawer(){document.getElementById('mobileDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');document.getElementById('burgerBtn').classList.remove('open');document.body.style.overflow=''}
+
+/* ── NAV ── */
+var ALL_NAV=['timer','puzzle','notifs','racing','shop'];
+function goTo(page,fromDrawer){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  ALL_NAV.forEach(function(id){var a=document.getElementById('dl-'+id);if(a)a.classList.remove('active')});
+  var pg=document.getElementById('page-'+page);if(pg)pg.classList.add('active');
+  var dl=document.getElementById('dl-'+page);if(dl)dl.classList.add('active');
+  if(fromDrawer)closeDrawer();
+  if(page==='puzzle')initChallengesPage();
+  if(page==='shop')renderShop();
+  if(page==='racing')initRacePage();
+}
+
+/* ── SLIDERS (fixed: no circular calls) ── */
+function initSliders(){
+  document.getElementById('studySlider').addEventListener('input',function(){
+    var v=parseInt(this.value);
+    document.getElementById('studySliderVal').textContent=v+'m';
+    document.getElementById('studyBadge').textContent=v+'m';
+    studyMin=v;currentDiff='custom';
+    document.querySelectorAll('.diff-btn').forEach(function(b){b.classList.remove('active')});
+    if(!timerRunning){totalSeconds=v*60;secondsLeft=totalSeconds;updateDisplay();updateRing()}
+    updateSessionInfo();
+  });
+  document.getElementById('breakSlider').addEventListener('input',function(){
+    var v=parseInt(this.value);
+    document.getElementById('breakSliderVal').textContent=v+'m';
+    document.getElementById('breakBadge').textContent=v+'m';
+    breakMin=v;breakSeconds=v*60;
+  });
+}
+function syncSlidersTo(study,brk){
+  var ss=document.getElementById('studySlider');
+  var bs=document.getElementById('breakSlider');
+  ss.value=study; bs.value=brk;
+  document.getElementById('studySliderVal').textContent=study+'m';
+  document.getElementById('breakSliderVal').textContent=brk+'m';
+  document.getElementById('studyBadge').textContent=study+'m';
+  document.getElementById('breakBadge').textContent=brk+'m';
+}
+
+/* ── TIMER ── */
+function setSubject(s,btn){
+  currentSubject=s;
+  document.querySelectorAll('.subj-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  updateSessionInfo();
+  sqSubject=s;sqTopic=null;renderStudyTabs();renderStudyCard();
+}
+function setDiff(d,btn,study,brk){
+  currentDiff=d;studyMin=study;breakMin=brk;
+  document.querySelectorAll('.diff-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  syncSlidersTo(study,brk);
+  if(!timerRunning){totalSeconds=study*60;breakSeconds=brk*60;secondsLeft=totalSeconds;updateDisplay();updateRing()}
+  updateSessionInfo();
+}
+function toggleTimer(){timerRunning?pauseTimer():startTimer()}
+function startTimer(){timerRunning=true;document.getElementById('startStopBtn').textContent='⏸ PAUSE';timerInterval=setInterval(tick,1000);updateSessionList()}
+function pauseTimer(){timerRunning=false;document.getElementById('startStopBtn').textContent='▶ RESUME';clearInterval(timerInterval)}
+function resetTimer(){pauseTimer();isBreak=false;secondsLeft=studyMin*60;totalSeconds=studyMin*60;document.getElementById('startStopBtn').textContent='▶ START';document.getElementById('timerLabel').textContent='STUDY TIME';updateDisplay();updateRing();updateSessionInfo()}
+function tick(){if(secondsLeft<=0){handleSessionEnd();return}secondsLeft--;if(!isBreak)todayMinutes++;updateDisplay();updateRing()}
+function handleSessionEnd(){
+  clearInterval(timerInterval);timerRunning=false;
+  if(!isBreak){
+    completedSessions++;todayBreaks++;streak++;
+    document.getElementById('statSessions').textContent=completedSessions;
+    document.getElementById('statMinutes').textContent=todayMinutes>=60?Math.floor(todayMinutes/60):todayMinutes;
+    document.getElementById('statBreaks').textContent=todayBreaks;
+    document.getElementById('statStreak').textContent=streak+'🔥';
+    sendNotif('🎉 Break Time!','Take a '+breakMin+' min break!');
+    showToast('🎉 Break time! You earned it!');
+    isBreak=true;totalSeconds=breakSeconds;secondsLeft=breakSeconds;
+    document.getElementById('timerLabel').textContent='BREAK ☕';
+    document.getElementById('startStopBtn').textContent='▶ START BREAK';
+  }else{
+    isBreak=false;totalSeconds=studyMin*60;secondsLeft=totalSeconds;
+    document.getElementById('timerLabel').textContent='STUDY TIME';
+    document.getElementById('startStopBtn').textContent='▶ START';
+    sendNotif('📚 Back to it!','Time to study '+currentSubject+'!');
+    showToast('📚 Back to work!');
+    if(completedSessions>=totalSessions){showToast('🏆 All sessions done! Amazing!');completedSessions=0}
+  }
+  saveData();updateDisplay();updateRing();updateSessionList();updateSessionInfo();
+}
+function updateDisplay(){var m=Math.floor(secondsLeft/60),s=secondsLeft%60;document.getElementById('timerDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+function updateRing(){document.getElementById('ringProgress').style.strokeDashoffset=584.3*(1-secondsLeft/totalSeconds)}
+function updateSessionInfo(){document.getElementById('sessionInfo').textContent='Session '+(completedSessions+1)+' of '+totalSessions+' · '+currentSubject+' · '+currentDiff.charAt(0).toUpperCase()+currentDiff.slice(1)}
+function updateSessionList(){
+  var list=document.getElementById('sessionList');list.innerHTML='';
+  for(var i=0;i<totalSessions;i++){
+    var done=i<completedSessions,active=i===completedSessions&&timerRunning&&!isBreak;
+    var li=document.createElement('li');li.className='session-item'+(active?' current':'');
+    li.innerHTML='<div class="session-dot" style="background:'+(done?'#4caf50':active?'var(--purple-light)':'rgba(255,255,255,.18)')+'"></div><span>'+(done?'✓ ':(i+1)+'. ')+currentSubject+' — '+studyMin+'min</span>'+(active?'<span style="margin-left:auto;font-size:.68rem;color:var(--orange-light)">ACTIVE</span>':'');
+    list.appendChild(li);
+    if(i<totalSessions-1){var bl=document.createElement('li');bl.className='session-item';bl.innerHTML='<div class="session-dot" style="background:'+(done?'#4caf50':'var(--orange-light)')+'"></div><span>'+(done?'✓ ':'  ')+'Break — '+breakMin+'min</span>';list.appendChild(bl)}
+  }
+}
+
+/* ── NOTIFICATIONS ── */
+function requestNotifPermission(){if(!('Notification' in window)){showToast('❌ Not supported');return}Notification.requestPermission().then(function(p){if(p==='granted'){showToast('✅ Notifications enabled!');document.getElementById('notifBanner').style.display='none'}else showToast('⚠️ Permission denied')})}
+function sendNotif(title,body){if(typeof Notification!=='undefined'&&Notification.permission==='granted')new Notification(title,{body:body})}
+function saveReminders(){studyMin=parseInt(document.getElementById('studyMinutes').value)||25;breakMin=parseInt(document.getElementById('breakMinutes').value)||5;totalSeconds=studyMin*60;breakSeconds=breakMin*60;secondsLeft=totalSeconds;syncSlidersTo(studyMin,breakMin);updateDisplay();updateRing();updateSessionInfo();showToast('✅ Settings saved!')}
+
+/* ── STUDY QUESTIONS DATA ── */
+var studyData={
+  Maths:{icon:'🔢',topics:{
+    'Algebra':[
+      {q:'Solve for x: 2x + 4 = 12',opts:['x = 3','x = 4','x = 5','x = 8'],ans:1,ex:'Subtract 4: 2x = 8. Divide by 2: <strong>x = 4</strong>.'},
+      {q:'Expand: 3(x + 5)',opts:['3x + 5','3x + 8','3x + 15','x + 15'],ans:2,ex:'3×x + 3×5 = <strong>3x + 15</strong>.'},
+      {q:'Factorise: x² + 5x + 6',opts:['(x+1)(x+6)','(x+2)(x+3)','(x−2)(x−3)','(x+6)(x+1)'],ans:1,ex:'Find numbers that multiply to 6 and add to 5: 2 and 3. Answer: <strong>(x+2)(x+3)</strong>.'},
+      {q:'Gradient of y = 3x − 7?',opts:['7','−7','3','−3'],ans:2,ex:'In y = mx + c, m is the gradient. Here <strong>m = 3</strong>.'},
+      {q:'Solve: 5x − 3 = 2x + 9',opts:['x = 2','x = 3','x = 4','x = 6'],ans:2,ex:'3x = 12 → <strong>x = 4</strong>.'},
+    ],
+    'Geometry':[
+      {q:'Area of a triangle: base 8cm, height 5cm?',opts:['40cm²','20cm²','13cm²','80cm²'],ans:1,ex:'½ × 8 × 5 = <strong>20cm²</strong>.'},
+      {q:'Right-angled triangle with legs 6 and 8. Hypotenuse?',opts:['10','12','14','9'],ans:0,ex:'√(36+64) = √100 = <strong>10</strong>.'},
+      {q:'Sum of angles in a triangle?',opts:['90°','180°','270°','360°'],ans:1,ex:'Always <strong>180°</strong>.'},
+      {q:'Area of circle with radius 7cm (π≈3.14)?',opts:['43.98cm²','153.86cm²','21.98cm²','49cm²'],ans:1,ex:'πr² = 3.14 × 49 ≈ <strong>153.86cm²</strong>.'},
+    ],
+    'Fractions':[
+      {q:'What is ¾ + ½?',opts:['1','1¼','1½','5/8'],ans:1,ex:'¾ + 2/4 = 5/4 = <strong>1¼</strong>.'},
+      {q:'Simplify: 18/24',opts:['½','⅔','¾','9/12'],ans:2,ex:'GCF is 6. 18÷6=3, 24÷6=4 → <strong>¾</strong>.'},
+      {q:'What is 2/3 of 30?',opts:['10','15','20','25'],ans:2,ex:'(2×30)/3 = <strong>20</strong>.'},
+      {q:'What is ⅗ × ⅔?',opts:['2/5','3/10','6/10','2/3'],ans:0,ex:'6/15 = <strong>2/5</strong>.'},
+    ]
+  }},
+  Science:{icon:'🔬',topics:{
+    'Biology':[
+      {q:'Powerhouse of the cell?',opts:['Nucleus','Ribosome','Mitochondria','Vacuole'],ans:2,ex:'The <strong>mitochondria</strong> produces ATP energy.'},
+      {q:'How do plants make food?',opts:['Respiration','Photosynthesis','Transpiration','Osmosis'],ans:1,ex:'<strong>Photosynthesis</strong>: CO₂ + H₂O + light → glucose + O₂.'},
+      {q:'Human body cell chromosomes?',opts:['23','46','48','92'],ans:1,ex:'<strong>46</strong> chromosomes — 23 pairs.'},
+      {q:'Which organ produces insulin?',opts:['Liver','Kidney','Pancreas','Stomach'],ans:2,ex:'The <strong>pancreas</strong> produces insulin.'},
+      {q:'Cell division that makes gametes?',opts:['Mitosis','Meiosis','Binary fission','Budding'],ans:1,ex:'<strong>Meiosis</strong> halves the chromosome number.'},
+    ],
+    'Chemistry':[
+      {q:'Chemical symbol for sodium?',opts:['So','Na','S','Sn'],ans:1,ex:'From Latin Natrium: <strong>Na</strong>.'},
+      {q:'pH of pure water?',opts:['5','6','7','8'],ans:2,ex:'Neutral pH = <strong>7</strong>.'},
+      {q:'Gas made when acid reacts with metal?',opts:['Oxygen','CO₂','Hydrogen','Nitrogen'],ans:2,ex:'Acid + metal → salt + <strong>hydrogen</strong>.'},
+      {q:'Protons in a carbon atom?',opts:['4','6','8','12'],ans:1,ex:'Atomic number 6 = <strong>6 protons</strong>.'},
+    ],
+    'Physics':[
+      {q:'Unit of force?',opts:['Watt','Joule','Newton','Pascal'],ans:2,ex:'Force is measured in <strong>Newtons (N)</strong>.'},
+      {q:'Speed of light (approx)?',opts:['3×10⁶ m/s','3×10⁸ m/s','3×10¹⁰ m/s','3×10⁴ m/s'],ans:1,ex:'Light travels at <strong>3×10⁸ m/s</strong>.'},
+      {q:"Ohm's Law?",opts:['V = IR','P = IV','E = mc²','F = ma'],ans:0,ex:'<strong>V = IR</strong> (Voltage = Current × Resistance).'},
+      {q:'Which wave cannot travel in a vacuum?',opts:['Light','Radio','Sound','X-ray'],ans:2,ex:'<strong>Sound</strong> needs a medium — it cannot travel through a vacuum.'},
+    ]
+  }},
+  English:{icon:'📖',topics:{
+    'Grammar':[
+      {q:'Which is grammatically correct?',opts:['Me and him went','Him and I went','He and I went','I and he went'],ans:2,ex:'"<strong>He and I went</strong>" — use subject pronouns as the subject.'},
+      {q:'What is a conjunction?',opts:['A describing word','A doing word','A joining word','A naming word'],ans:2,ex:'A <strong>joining word</strong> — e.g. and, but, because, although.'},
+      {q:'Which is a proper noun?',opts:['city','happiness','London','running'],ans:2,ex:'<strong>London</strong> is a proper noun — a specific name.'},
+      {q:'Past tense of "go"?',opts:['Goed','Went','Gone','Going'],ans:1,ex:'"Go" is irregular. Past tense = <strong>went</strong>.'},
+    ],
+    'Literature':[
+      {q:'Who wrote Romeo and Juliet?',opts:['Dickens','Shakespeare','Austen','Keats'],ans:1,ex:'Written by <strong>William Shakespeare</strong>, ~1594–96.'},
+      {q:'"The wind whispered" — what device is this?',opts:['Simile','Metaphor','Personification','Alliteration'],ans:2,ex:'<strong>Personification</strong> — giving a non-human thing a human quality.'},
+      {q:'Theme of "Animal Farm"?',opts:['Friendship','Danger of totalitarianism','Environment','Coming of age'],ans:1,ex:'An allegory about <strong>the danger of totalitarianism</strong> and power corruption.'},
+      {q:'What is a soliloquy?',opts:['14-line poem','Speaking alone on stage','A rhyme scheme','A narrative technique'],ans:1,ex:'A character speaks their thoughts <strong>alone on stage</strong>.'},
+    ],
+    'Vocabulary':[
+      {q:'What does "benevolent" mean?',opts:['Cruel','Well-meaning and kind','Shy','Energetic'],ans:1,ex:'"Benevolent" = <strong>well-meaning and kind</strong>.'},
+      {q:'Synonym for "courageous"?',opts:['Timid','Reckless','Brave','Cautious'],ans:2,ex:'Courageous = <strong>brave</strong>. Also: bold, valiant, fearless.'},
+      {q:'What does "ambiguous" mean?',opts:['Clear and obvious','More than one interpretation','Entirely false','Very important'],ans:1,ex:'"Ambiguous" = <strong>open to more than one interpretation</strong>.'},
+      {q:'Antonym for "transparent"?',opts:['Clear','Obvious','Opaque','Shiny'],ans:2,ex:'Opposite of transparent = <strong>opaque</strong>.'},
+    ]
+  }}
+};
+
+/* ── STUDY PANEL (on timer screen) ── */
+function renderStudyTabs(){
+  var tabs=document.getElementById('studyTabs');tabs.innerHTML='';
+  Object.keys(studyData).forEach(function(subj){
+    var btn=document.createElement('button');
+    btn.className='stab'+(sqSubject===subj?' active':'');
+    btn.textContent=studyData[subj].icon+' '+subj;
+    btn.onclick=function(){sqSubject=subj;sqTopic=null;document.querySelectorAll('.stab').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');renderTopicRow();sqReset()};
+    tabs.appendChild(btn);
+  });
+  renderTopicRow();
+}
+function renderTopicRow(){
+  var row=document.getElementById('studyTopicRow');row.innerHTML='';
+  if(!sqSubject)return;
+  Object.keys(studyData[sqSubject].topics).forEach(function(t){
+    var chip=document.createElement('button');
+    chip.className='stopik'+(sqTopic===t?' active':'');
+    chip.textContent=t;
+    chip.onclick=function(){sqTopic=t;document.querySelectorAll('.stopik').forEach(function(b){b.classList.remove('active')});chip.classList.add('active');sqStart()};
+    row.appendChild(chip);
+  });
+}
+function sqStart(){
+  sqQs=studyData[sqSubject].topics[sqTopic].slice();
+  sqIdx=0;sqAnswered=new Array(sqQs.length).fill(null);sqCorrect=0;sqWrong=0;
+  document.getElementById('sqScores').style.display='flex';
+  document.getElementById('sqProgressBar').style.display='block';
+  document.getElementById('sqNav').style.display='flex';
+  sqUpdateScores();renderStudyCard();
+}
+function sqReset(){
+  sqQs=[];sqIdx=0;sqAnswered=[];sqCorrect=0;sqWrong=0;
+  document.getElementById('sqScores').style.display='none';
+  document.getElementById('sqProgressBar').style.display='none';
+  document.getElementById('sqNav').style.display='none';
+  document.getElementById('sqCardArea').innerHTML='<div class="sq-empty"><div class="sq-emoji">📚</div><div style="font-weight:700;font-size:.85rem">Pick a subject tab above, then choose a topic!</div></div>';
+}
+function sqUpdateScores(){
+  var left=sqQs.filter(function(_,i){return sqAnswered[i]===null}).length;
+  document.getElementById('sqCorrect').textContent=sqCorrect;
+  document.getElementById('sqWrong').textContent=sqWrong;
+  document.getElementById('sqLeft').textContent=left;
+  document.getElementById('sqProgressFill').style.width=(100*(sqCorrect+sqWrong)/sqQs.length)+'%';
+  document.getElementById('sqCounter').textContent=(sqIdx+1)+'/'+sqQs.length;
+}
+function renderStudyCard(){
+  if(!sqQs.length)return;
+  var q=sqQs[sqIdx];
+  var answered=sqAnswered[sqIdx];
+  var html='<div class="sq-card"><div class="sq-num">Q'+(sqIdx+1)+' of '+sqQs.length+'</div>';
+  html+='<div class="sq-q">'+q.q+'</div>';
+  html+='<div class="sq-opts">';
+  q.opts.forEach(function(opt,i){
+    var cls='sq-opt';var dis='';
+    if(answered!==null){dis='disabled';if(i===q.ans)cls+=' sq-show-correct';if(answered===i&&i!==q.ans)cls+=' sq-wrong'}
+    html+='<button class="'+cls+'" '+dis+' onclick="sqAnswer('+i+')">'+opt+'</button>';
+  });
+  html+='</div>';
+  html+='<div class="sq-footer">';
+  if(answered===null){html+='<button class="sq-hint" onclick="sqShowHint()">💡 Hint</button>'}
+  else{html+='<span style="font-size:.76rem;font-weight:700;color:'+(answered===q.ans?'#7ddb7d':'#f07070')+'">'+(answered===q.ans?'✓ Correct!':'✗ Wrong')+'</span>'}
+  html+='</div>';
+  html+='<div class="sq-explain'+(answered!==null?' show':'')+'" id="sqExplain">'+q.ex+'</div>';
+  html+='</div>';
+
+  /* check if showing result */
+  var allDone=sqQs.length>0&&sqAnswered.every(function(a){return a!==null});
+  if(allDone){
+    var pct=Math.round(sqCorrect/sqQs.length*100);
+    var stars=pct>=90?'⭐⭐⭐':pct>=60?'⭐⭐':'⭐';
+    var title=pct>=90?'Outstanding! 🎉':pct>=60?'Good Work! 👍':'Keep Going! 💪';
+    var msg=sqCorrect+'/'+sqQs.length+' correct ('+pct+'%)';
+    html='<div class="sq-result"><div class="sq-stars">'+stars+'</div><h4>'+title+'</h4><p>'+msg+'</p><div class="sq-result-btns"><button class="ctrl-btn primary" style="padding:8px 16px;font-size:.8rem" onclick="sqRetry()">↺ Retry</button><button class="ctrl-btn secondary" style="padding:8px 16px;font-size:.8rem" onclick="sqNextTopic()">Next Topic ▶</button></div></div>';
+    document.getElementById('sqNav').style.display='none';
+  }
+  document.getElementById('sqCardArea').innerHTML=html;
+  sqUpdateScores();
+}
+function sqAnswer(idx){
+  if(!sqQs.length||sqAnswered[sqIdx]!==null)return;
+  sqAnswered[sqIdx]=idx;
+  if(idx===sqQs[sqIdx].ans){sqCorrect++;showToast('✅ Correct!')}
+  else{sqWrong++;showToast('❌ Wrong — check the hint!')}
+  renderStudyCard();
+  if(sqIdx<sqQs.length-1)setTimeout(function(){if(sqAnswered[sqIdx]!==null)sqNext()},1300);
+}
+function sqShowHint(){var e=document.getElementById('sqExplain');if(e)e.classList.add('show')}
+function sqPrev(){if(sqIdx>0){sqIdx--;renderStudyCard()}}
+function sqNext(){if(sqIdx<sqQs.length-1){sqIdx++;renderStudyCard()}}
+function sqRetry(){sqIdx=0;sqAnswered=new Array(sqQs.length).fill(null);sqCorrect=0;sqWrong=0;document.getElementById('sqNav').style.display='flex';renderStudyCard()}
+function sqNextTopic(){
+  var keys=Object.keys(studyData[sqSubject].topics);
+  var i=keys.indexOf(sqTopic);
+  var next=keys[(i+1)%keys.length];
+  sqTopic=next;
+  document.querySelectorAll('.stopik').forEach(function(b){b.classList.remove('active')});
+  var chips=document.querySelectorAll('.stopik');
+  if(chips[keys.indexOf(next)])chips[keys.indexOf(next)].classList.add('active');
+  sqStart();
+}
+
+/* ── CHALLENGES ENGINE ── */
+// Catalog: challenges inspired by real problem sets, all original rewrites with source attribution
+var challenges=[
+  /* ── MATHS ── */
+  {id:'M001',date:'2026-03-25',subj:'maths',diff:'easy',
+   title:'The Missing Multiple',
+   context:'Multiples are the result of multiplying a whole number by another. For example, multiples of 3 include 3, 6, 9, 12…',
+   question:'What is the sum of all multiples of 3 or 5 that are below 20?',
+   hint:'List all multiples of 3 below 20: 3,6,9,12,15,18. List all multiples of 5: 5,10,15. Remove duplicates, then add them all up.',
+   answer:'78',answers:null,
+   source:'Inspired by Project Euler Problem 1',sourceUrl:'https://projecteuler.net/problem=1'},
+
+  {id:'M002',date:'2026-03-26',subj:'maths',diff:'medium',
+   title:'Square Spiral',
+   context:'A Fibonacci-like sequence starts: 1, 1, 2, 3, 5, 8, 13, 21, 34…',
+   question:'What is the 10th term of the Fibonacci sequence?',
+   hint:'Keep adding: after 34 comes 21+34=55, then 34+55=89.',
+   answer:'55',answers:null,
+   source:'Classic sequence problem',sourceUrl:null},
+
+  {id:'M003',date:'2026-03-27',subj:'maths',diff:'medium',
+   title:'Power Play',
+   context:'Indices (powers) describe how many times a number is multiplied by itself.',
+   question:'What is 2¹⁰ (2 to the power of 10)?',
+   hint:'Double the number 10 times starting from 1: 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024.',
+   answer:'1024',answers:null,
+   source:'Classic indices question',sourceUrl:null},
+
+  {id:'M004',date:'2026-03-28',subj:'maths',diff:'hard',
+   title:'The Palindrome Primes',
+   context:'A prime number is divisible only by 1 and itself. A palindrome reads the same forwards and backwards.',
+   question:'What is the smallest 3-digit palindrome prime?',
+   hint:'Palindrome 3-digit numbers start: 101, 111, 121… Check which is prime. 101 is not divisible by 2, 3, 5, or 7.',
+   answer:'101',answers:null,
+   source:'Inspired by UKMT Junior Mathematical Challenge style problems',sourceUrl:'https://www.ukmt.org.uk'},
+
+  {id:'M005',date:'2026-03-29',subj:'maths',diff:'challenge',
+   title:'The Locker Problem',
+   context:'100 lockers are all closed. 100 students walk past: student 1 opens every locker, student 2 toggles every 2nd locker, student 3 toggles every 3rd locker, and so on.',
+   question:'How many lockers are open after all 100 students have passed?',
+   hint:'A locker ends up open if toggled an odd number of times. That only happens for perfect squares (1, 4, 9, 16… have an odd number of factors). Count perfect squares up to 100.',
+   answer:'10',answers:null,
+   source:'Classic combinatorics / number theory puzzle',sourceUrl:null},
+
+  {id:'M006',date:'2026-03-30',subj:'maths',diff:'easy',
+   title:'Fraction Action',
+   context:'When adding fractions, you need a common denominator.',
+   question:'Calculate: 5/6 + 7/12. Give your answer as a fraction in its simplest form.',
+   hint:'Convert 5/6 to 10/12. Then 10/12 + 7/12 = 17/12.',
+   answer:'17/12',answers:null,
+   source:'GCSE Foundation Maths style',sourceUrl:null},
+
+  {id:'M007',date:'2026-03-31',subj:'maths',diff:'medium',
+   title:'Area Detectives',
+   context:'A shape is made by cutting a square of side 4cm from the corner of a rectangle that is 10cm by 8cm.',
+   question:'What is the area of the remaining shape in cm²?',
+   hint:'Area of rectangle = 10×8 = 80. Area of square cut out = 4×4 = 16. Subtract.',
+   answer:'64',answers:null,
+   source:'GCSE Geometry style',sourceUrl:null},
+
+  {id:'M008',date:'2026-04-01',subj:'maths',diff:'hard',
+   title:'Digit Detective',
+   context:'When we write the integers 1 to 100, we use many individual digit characters.',
+   question:'How many times does the digit 1 appear when you write out all integers from 1 to 100?',
+   hint:'Count 1s in the units place (1,11,21…91 = 10 times) and 1s in the tens place (10–19 = 10 times). Don\'t forget 100 has one "1".',
+   answer:'21',answers:null,
+   source:'Inspired by Project Euler Problem 20 style digit counting',sourceUrl:'https://projecteuler.net'},
+
+  /* ── SCIENCE ── */
+  {id:'S001',date:'2026-04-02',subj:'science',diff:'easy',
+   title:'Atomic Neighbours',
+   context:'Elements in the periodic table are arranged by atomic number. Carbon is element 6.',
+   question:'Which element has atomic number 7 (one position after carbon in the periodic table)?',
+   hint:'It makes up about 78% of the Earth\'s atmosphere.',
+   answer:'NITROGEN',answers:null,
+   source:'Periodic table chemistry — GCSE AQA Chemistry',sourceUrl:'https://www.aqa.org.uk'},
+
+  {id:'S002',date:'2026-04-03',subj:'science',diff:'medium',
+   title:'Speed of Sound',
+   context:'Sound travels at approximately 343 metres per second in air at 20°C. Lightning and thunder happen simultaneously, but light reaches us almost instantly.',
+   question:'If you see lightning and hear thunder 5 seconds later, roughly how far away was the lightning strike (in km)?',
+   hint:'Distance = speed × time = 343 × 5 = 1715m. Convert to km.',
+   answer:'1.715',answers:null,
+   source:'Physics wave speed problem — GCSE Physics',sourceUrl:null},
+
+  {id:'S003',date:'2026-04-04',subj:'science',diff:'hard',
+   title:'The Reaction Race',
+   context:'Magnesium reacts with oxygen: 2Mg + O₂ → 2MgO. Magnesium (Mg) has a molar mass of 24 g/mol, and MgO has a molar mass of 40 g/mol.',
+   question:'If 4.8g of magnesium is burned completely, how many grams of MgO is produced?',
+   hint:'4.8g Mg ÷ 24 g/mol = 0.2 mol Mg. From the equation, 2 mol Mg → 2 mol MgO, so 0.2 mol MgO is produced. 0.2 × 40 = 8g.',
+   answer:'8',answers:null,
+   source:'GCSE Chemistry stoichiometry style',sourceUrl:'https://www.bbc.co.uk/bitesize'},
+
+  {id:'S004',date:'2026-04-05',subj:'science',diff:'medium',
+   title:'Resistance in Series',
+   context:'When resistors are connected in series, the total resistance is simply the sum of all individual resistances.',
+   question:'Three resistors of 4Ω, 6Ω and 10Ω are connected in series. What is the total resistance in ohms?',
+   hint:'Just add them: 4 + 6 + 10.',
+   answer:'20',answers:null,
+   source:'GCSE Physics — Electricity',sourceUrl:'https://www.bbc.co.uk/bitesize/topics/zgyb4wx'},
+
+  {id:'S005',date:'2026-04-06',subj:'science',diff:'challenge',
+   title:'Half Life',
+   context:'Radioactive decay follows a predictable pattern. The "half-life" is the time it takes for half the atoms in a sample to decay.',
+   question:'A sample starts with 80g of a radioactive isotope. After 3 half-lives, how many grams remain?',
+   hint:'After 1 half-life: 40g. After 2: 20g. After 3: 10g.',
+   answer:'10',answers:null,
+   source:'GCSE Physics — Radioactivity (AQA)',sourceUrl:'https://www.aqa.org.uk'},
+
+  /* ── ENGLISH ── */
+  {id:'E001',date:'2026-04-07',subj:'english',diff:'easy',
+   title:'Word Morph',
+   context:'Anagrams rearrange the letters of a word to make a completely different word.',
+   question:'Rearrange the letters of SILENT to form one other common English word.',
+   hint:'Try moving the L to the start…',
+   answer:'LISTEN',answers:null,
+   source:'English word puzzle',sourceUrl:null},
+
+  {id:'E002',date:'2026-04-08',subj:'english',diff:'medium',
+   title:'The Missing Device',
+   context:'Writers use literary devices to make their writing more powerful. "Simile" uses "like" or "as". "Metaphor" makes a direct comparison. "Alliteration" repeats the same starting sound.',
+   question:'Identify the literary device in: "Peter Piper picked a peck of pickled peppers."',
+   hint:'Every major word starts with the same letter.',
+   answer:'ALLITERATION',answers:null,
+   source:'English Literature — GCSE AQA English Language',sourceUrl:'https://www.aqa.org.uk'},
+
+  {id:'E003',date:'2026-04-09',subj:'english',diff:'hard',
+   title:'Shakespearean Riddle',
+   context:'"All the world\'s a stage, / And all the men and women merely players; / They have their exits and their entrances…" — As You Like It, Act II, Scene VII.',
+   question:'In the quote above, what literary device does Shakespeare use when he says "All the world\'s a stage"?',
+   hint:'It makes a direct comparison without using "like" or "as".',
+   answer:'METAPHOR',answers:null,
+   source:'Shakespeare — As You Like It (public domain)',sourceUrl:'https://www.gutenberg.org/ebooks/1120'},
+
+  {id:'E004',date:'2026-04-10',subj:'english',diff:'medium',
+   title:'Prefix Power',
+   context:'Prefixes change the meaning of a root word. "un-" means not. "re-" means again. "pre-" means before. "mis-" means wrongly.',
+   question:'What prefix turns "understand" into a word meaning "to understand incorrectly"?',
+   hint:'Which prefix means "wrongly"?',
+   answer:'MIS',answers:null,
+   source:'GCSE English Language — Vocabulary',sourceUrl:null},
+
+  /* ── LOGIC ── */
+  {id:'L001',date:'2026-04-11',subj:'logic',diff:'medium',
+   title:'The Farmer\'s Dilemma',
+   context:'A classic river-crossing puzzle. A farmer must cross a river in a boat that fits only him and one item at a time. He has a fox, a chicken, and a bag of grain. If left alone: the fox eats the chicken, or the chicken eats the grain.',
+   question:'What is the minimum number of river crossings needed to get all three safely across?',
+   hint:'The key is taking the chicken first, then coming back and going clever about the fox and grain. 7 crossings total.',
+   answer:'7',answers:null,
+   source:'Classic river crossing logic puzzle (public domain)',sourceUrl:null},
+
+  {id:'L002',date:'2026-04-12',subj:'logic',diff:'hard',
+   title:'Truth Tellers',
+   context:'On an island, Knights always tell the truth and Knaves always lie. You meet two people, A and B.',
+   question:'A says: "At least one of us is a Knave." Is A a Knight or a Knave?',
+   hint:'If A were a Knave, the statement "at least one of us is a Knave" would be true — but Knaves can\'t tell the truth. Contradiction! So A must be a Knight.',
+   answer:'KNIGHT',answers:null,
+   source:'Inspired by Raymond Smullyan\'s logic puzzles (What is the Name of This Book?)',sourceUrl:'https://en.wikipedia.org/wiki/Raymond_Smullyan'},
+
+  {id:'L003',date:'2026-04-13',subj:'logic',diff:'easy',
+   title:'Clock Conundrum',
+   context:'Analogue clocks have hour and minute hands that rotate continuously.',
+   question:'How many times in a 12-hour period do the hour and minute hands of a clock overlap exactly?',
+   hint:'They overlap at 12:00, then roughly 1:05, 2:11, 3:16… 11 times per 12 hours.',
+   answer:'11',answers:null,
+   source:'Classic logic / maths puzzle',sourceUrl:null},
+
+  {id:'L004',date:'2026-04-14',subj:'logic',diff:'challenge',
+   title:'The Chessboard Squares',
+   context:'A standard chessboard has 8×8 = 64 small squares. But you can also count larger squares formed by combining smaller ones.',
+   question:'How many squares of ALL sizes are there on a standard 8×8 chessboard?',
+   hint:'Count: 8×8=64 (1×1 squares), 7×7=49 (2×2), 6×6=36 (3×3)… all the way to 1×1=1 (8×8). Sum the sequence of perfect squares.',
+   answer:'204',answers:null,
+   source:'Classic combinatorics puzzle — AMC/UKMT style',sourceUrl:'https://www.ukmt.org.uk'},
+
+  {id:'L005',date:'2026-04-15',subj:'logic',diff:'medium',
+   title:'Weighing Scales',
+   context:'You have 9 identical-looking balls. One is slightly heavier than the others. You have a balance scale.',
+   question:'What is the minimum number of weighings needed to guarantee finding the heavier ball?',
+   hint:'Split into groups of 3. Weigh group 1 vs group 2. If equal, the odd one is in group 3. Then weigh 2 of those 3. That\'s 2 weighings total.',
+   answer:'2',answers:null,
+   source:'Classic balance puzzle — widely used in mathematical olympiads',sourceUrl:null},
+];
+
+// State
+var chalMode='today';  // 'today' | 'all'
+var chalFilter='all';
+var currentChal=null;
+
+function dateKey(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function initChallengesPage(){
+  var today=new Date();
+  var key=dateKey(today);
+  document.getElementById('chalDateBadge').textContent='Today: '+today.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('chalUrlToday').textContent=window.location.pathname.replace(/\/[^/]*$/,'')+'/challenges/'+key;
+
+  // Check hash for direct URL routing: #challenges/2026-03-25 or #challenges
+  var hash=window.location.hash.replace('#','');
+  if(hash.startsWith('challenges/')){
+    var dateStr=hash.replace('challenges/','');
+    var match=challenges.find(function(c){return c.date===dateStr});
+    if(match){openChallenge(match);return}
+  }
+  chalMode='today';chalFilter='all';
+  document.querySelectorAll('.chal-mode-btn').forEach(function(b){b.classList.remove('active')});
+  var mb=document.getElementById('modeBtnToday');if(mb)mb.classList.add('active');
+  document.querySelectorAll('.tag').forEach(function(t){t.classList.remove('active')});
+  var ft=document.querySelector('.tag');if(ft)ft.classList.add('active');
+  renderChallenges();
+}
+
+function setChalMode(mode,btn){
+  chalMode=mode;
+  document.querySelectorAll('.chal-mode-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  renderChallenges();
+}
+
+function filterChals(f,el){
+  chalFilter=f;
+  document.querySelectorAll('.tag').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  renderChallenges();
+}
+
+function renderChallenges(){
+  document.getElementById('chalListView').style.display='';
+  document.getElementById('chalDetailView').style.display='none';
+  var today=new Date();
+  var todayKey=dateKey(today);
+  var list=challenges.slice();
+
+  if(chalMode==='today'){
+    // Show today's challenge + some recent ones (by date closeness)
+    list=list.filter(function(c){return c.date<=todayKey}).sort(function(a,b){return b.date.localeCompare(a.date)}).slice(0,5);
+  }else{
+    list=list.filter(function(c){return c.date<=todayKey}).sort(function(a,b){return b.date.localeCompare(a.date)});
+  }
+  if(chalFilter!=='all')list=list.filter(function(c){return c.subj===chalFilter});
+
+  var feed=document.getElementById('chalFeed');feed.innerHTML='';
+  if(!list.length){feed.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-muted);font-weight:700">No challenges match your filter.</div>';return}
+
+  list.forEach(function(c,i){
+    var isToday=c.date===todayKey;
+    var card=document.createElement('div');
+    card.className='chal-card diff-'+c.diff+(isToday&&i===0?' featured':'');
+    card.onclick=function(){openChallenge(c)};
+    var subjClass='subj-'+c.subj;
+    var diffLabel={easy:'🟢 Easy',medium:'🟡 Medium',hard:'🔴 Hard',challenge:'💀 Challenge'}[c.diff]||c.diff;
+    card.innerHTML=
+      '<div class="chal-title-row">'+(isToday&&i===0?'<span style="font-size:.65rem;font-weight:800;color:var(--orange-light);letter-spacing:1px;text-transform:uppercase">⭐ TODAY\'S CHALLENGE</span>':'')+'</div>'+
+      '<div class="chal-title-row"><div class="chal-title">'+c.title+'</div>'+
+        '<span class="chal-tag '+subjClass+'">'+c.subj.charAt(0).toUpperCase()+c.subj.slice(1)+'</span>'+
+        '<span class="chal-tag diff-'+c.diff+'">'+diffLabel+'</span>'+
+      '</div>'+
+      '<div class="chal-meta">'+new Date(c.date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+'</div>'+
+      '<div class="chal-desc">'+c.context.substring(0,100)+(c.context.length>100?'…':'')+'</div>'+
+      '<div class="chal-source">'+(c.source?'📚 Source: '+(c.sourceUrl?'<a href="'+c.sourceUrl+'" target="_blank" rel="noopener">'+c.source+'</a>':c.source):'')+'</div>';
+    feed.appendChild(card);
+  });
+}
+
+function openChallenge(c){
+  currentChal=c;
+  window.location.hash='challenges/'+c.date;
+  document.getElementById('chalListView').style.display='none';
+  document.getElementById('chalDetailView').style.display='';
+  var isToday=c.date===dateKey(new Date());
+  var diffLabel={easy:'🟢 Easy',medium:'🟡 Medium',hard:'🔴 Hard',challenge:'💀 Challenge'}[c.diff]||c.diff;
+  var subjLabel=c.subj.charAt(0).toUpperCase()+c.subj.slice(1);
+  document.getElementById('cdTitle').textContent=c.title;
+  document.getElementById('cdTags').innerHTML=
+    '<span class="chal-tag subj-'+c.subj+'">'+subjLabel+'</span>'+
+    '<span class="chal-tag diff-'+c.diff+'">'+diffLabel+'</span>'+
+    (isToday?'<span class="chal-tag" style="background:rgba(255,200,0,.15);border-color:#ffd700;color:#ffd700">⭐ Today\'s Challenge</span>':'');
+  document.getElementById('cdContext').innerHTML=c.context;
+  document.getElementById('cdQuestion').textContent=c.question;
+  var hints=document.getElementById('cdHints');
+  hints.innerHTML='<strong>💡 Hint:</strong> '+c.hint;
+  hints.classList.remove('show');
+  document.getElementById('cdAnswer').value='';
+  document.getElementById('cdFeedback').textContent='';
+  document.getElementById('cdFeedback').style.color='';
+  document.getElementById('cdSource').innerHTML=c.source
+    ? '📚 '+( c.sourceUrl ? '<a href="'+c.sourceUrl+'" target="_blank" rel="noopener">'+c.source+'</a>' : c.source )
+    : '';
+}
+
+function backToChalList(){
+  window.location.hash='challenges';
+  document.getElementById('chalDetailView').style.display='none';
+  document.getElementById('chalListView').style.display='';
+}
+
+function toggleChalHint(){
+  document.getElementById('cdHints').classList.toggle('show');
+}
+
+function checkChalAnswer(){
+  if(!currentChal)return;
+  var raw=document.getElementById('cdAnswer').value.trim();
+  var ans=raw.toUpperCase().replace(/\s+/g,'');
+  var correct=currentChal.answer.toString().toUpperCase().replace(/\s+/g,'');
+  var fb=document.getElementById('cdFeedback');
+  if(ans===correct){
+    fb.textContent='✅ Correct! +5 🪙 coins awarded!';
+    fb.style.color='#7ddb7d';
+    coins+=5;updateCoinDisplays();saveData();
+    showToast('🎉 Challenge solved! +5 🪙');
+  }else{
+    fb.textContent='❌ Not quite — check the hint!';
+    fb.style.color='#f07070';
+  }
+}
+
+// Handle back button / hash changes
+window.addEventListener('hashchange',function(){
+  var hash=window.location.hash.replace('#','');
+  if(hash.startsWith('challenges/')){
+    var dateStr=hash.replace('challenges/','');
+    var match=challenges.find(function(c){return c.date===dateStr});
+    if(match){openChallenge(match)}
+  }else if(hash==='challenges'||hash===''){
+    if(document.getElementById('page-puzzle').classList.contains('active'))backToChalList();
+  }
+});
+
+/* (legacy puzzle modal helpers now replaced by challenge system) */
+var currentPuzzleAnswer='';
+function closePuzzleModal(e){if(!e||e.target===document.getElementById('puzzleModal'))document.getElementById('puzzleModal').classList.remove('open')}
+function checkPuzzleAnswer(){}
+
+/* ── RACE ── */
+var STEP_FW=15,STEP_BK=10,FINISH=88;
+var raceQs={
+  Maths:[{q:'7 × 8?',answers:['54','56','58','52'],correct:1},{q:'√144?',answers:['11','12','13','14'],correct:1},{q:'15% of 200?',answers:['25','30','35','40'],correct:1},{q:'Solve: 3x+6=21',answers:['x=3','x=4','x=5','x=6'],correct:2},{q:'2³ + 5?',answers:['11','13','15','17'],correct:1},{q:'Area of 6×4 rectangle?',answers:['20','22','24','26'],correct:2}],
+  Science:[{q:'Symbol for Gold?',answers:['Au','Ag','Fe','Cu'],correct:0},{q:'Bones in adult body?',answers:['196','206','216','226'],correct:1},{q:'Closest planet to Sun?',answers:['Venus','Mars','Mercury','Earth'],correct:2},{q:'Gas plants absorb?',answers:['Oxygen','Nitrogen','CO₂','Hydrogen'],correct:2},{q:'Powerhouse of cell?',answers:['Nucleus','Ribosome','Mitochondria','Vacuole'],correct:2}],
+  English:[{q:"Antonym of 'ancient'?",answers:['Old','Modern','Large','Tiny'],correct:1},{q:'Which is a conjunction?',answers:['Run','Blue','Because','Quickly'],correct:2},{q:"'I before E, except after ___'",answers:['A','C','S','T'],correct:1},{q:"Syllables in 'beautiful'?",answers:['2','3','4','5'],correct:1},{q:"Simile uses what word?",answers:['The','A','Like','But'],correct:2}]
+};
+function initRacePage(){carPosition=5;raceScore=0;raceStreakCount=0;racePendingPts=0;raceActive=false;raceAwaitingAnswer=false;document.getElementById('raceCar').style.left=carPosition+'%';document.getElementById('raceProgressFill').style.width=carPosition+'%';document.getElementById('raceScore').textContent=0;document.getElementById('raceStreak').textContent=0;document.getElementById('raceTotalCoins').textContent=coins;document.getElementById('raceQuestion').textContent='Press Start Race to begin!';document.getElementById('raceAnswers').innerHTML='';document.getElementById('lapBanner').classList.remove('show');document.getElementById('raceStartBtn').style.display=''}
+function startRace(){raceActive=true;document.getElementById('raceStartBtn').style.display='none';loadNextRaceQ()}
+function loadNextRaceQ(){if(!raceActive)return;raceAwaitingAnswer=true;var pool=raceQs[currentSubject]||raceQs.Maths;currentRaceQ=pool[Math.floor(Math.random()*pool.length)];document.getElementById('raceQuestion').textContent=currentRaceQ.q;var div=document.getElementById('raceAnswers');div.innerHTML='';currentRaceQ.answers.forEach(function(a,i){var btn=document.createElement('button');btn.className='ans-btn';btn.textContent=a;btn.onclick=function(){if(raceAwaitingAnswer)handleRaceAnswer(i,btn)};div.appendChild(btn)})}
+var racePendingPts=0; // accumulates pts, converts to coins at 2pts=1coin
+function handleRaceAnswer(idx,btn){
+  if(!raceAwaitingAnswer)return;
+  raceAwaitingAnswer=false;
+  document.querySelectorAll('.ans-btn').forEach(function(b){b.disabled=true});
+  var car=document.getElementById('raceCar');
+  if(idx===currentRaceQ.correct){
+    btn.classList.add('correct');
+    var pts=10+raceStreakCount*2;
+    raceScore+=pts;
+    raceStreakCount++;
+    carPosition=Math.min(FINISH+2,carPosition+STEP_FW);
+    // Award coins: every 2 pts = 1 coin
+    racePendingPts+=pts;
+    var earned=Math.floor(racePendingPts/2);
+    if(earned>0){racePendingPts=racePendingPts%2;coins+=earned;updateCoinDisplays();saveData();showToast('✅ +'+pts+' pts → +'+earned+' 🪙 coin'+(earned>1?'s':'')+'!')}
+    else{showToast('✅ Correct! +'+pts+' pts')}
+  }else{
+    btn.classList.add('wrong');
+    document.querySelectorAll('.ans-btn')[currentRaceQ.correct].classList.add('correct');
+    raceStreakCount=0;
+    carPosition=Math.max(5,carPosition-STEP_BK);
+    car.classList.remove('shake');void car.offsetWidth;car.classList.add('shake');
+    showToast('❌ Wrong! Car pushed back!');
+  }
+  car.style.left=carPosition+'%';
+  document.getElementById('raceProgressFill').style.width=carPosition+'%';
+  document.getElementById('raceScore').textContent=raceScore;
+  document.getElementById('raceStreak').textContent=raceStreakCount;
+  if(carPosition>=FINISH)setTimeout(lapComplete,600);else setTimeout(loadNextRaceQ,1200);
+}
+function lapComplete(){
+  raceActive=false;
+  // Bonus 50 coins for finishing the lap
+  coins+=50;
+  updateCoinDisplays();saveData();
+  document.getElementById('lapBannerMsg').textContent='+50 bonus coins! Total: 🪙 '+coins;
+  document.getElementById('lapBanner').classList.add('show');
+}
+function startNextLap(){document.getElementById('lapBanner').classList.remove('show');carPosition=5;raceScore=0;raceStreakCount=0;racePendingPts=0;raceActive=true;document.getElementById('raceCar').style.left='5%';document.getElementById('raceProgressFill').style.width='5%';document.getElementById('raceScore').textContent=0;document.getElementById('raceStreak').textContent=0;loadNextRaceQ()}
+
+/* ── SHOP ── */
+var shopItems=[
+  {id:'default',name:'Classic Purple',price:0,desc:'The original Time Break look. Always free!',preview:'linear-gradient(135deg,#3d1478,#6c2eb9,#b84a0e)'},
+  {id:'myles',name:'Myles Theme',price:0,desc:'A cool blue and light blue theme. Free for everyone! 💙',preview:'linear-gradient(135deg,#020d1a,#0050b0,#00b4d8)'},
+  {id:'galaxy',name:'Galaxy',price:40,desc:'Deep space vibes with electric indigo.',preview:'linear-gradient(135deg,#04000f,#2d0060,#001a4d)'},
+  {id:'sunset',name:'Sunset Blaze',price:40,desc:'Warm crimson and ember tones.',preview:'linear-gradient(135deg,#1a0505,#7a1500,#4d0020)'},
+  {id:'ocean',name:'Deep Ocean',price:50,desc:'Cool teal and deep-sea blue.',preview:'linear-gradient(135deg,#001a2e,#003d6e,#006b60)'},
+  {id:'forest',name:'Midnight Forest',price:50,desc:'Dark greens and forest shadows.',preview:'linear-gradient(135deg,#051a08,#0d4012,#1a6b20)'},
+  {id:'neon',name:'Neon Rave',price:80,desc:'Electric pinks, cyans, and golds.',preview:'linear-gradient(135deg,#050510,#3d0040,#004040)'},
+];
+function renderShop(){
+  document.getElementById('shopCoins').textContent=coins;
+  var grid=document.getElementById('shopGrid');grid.innerHTML='';
+  shopItems.forEach(function(item){
+    var owned=ownedThemes.indexOf(item.id)!==-1;
+    var isActive=activeTheme===item.id;
+    var div=document.createElement('div');
+    div.className='shop-item'+(isActive?' active-theme':owned?' owned':'');
+    var badge=isActive?'<span class="active-badge">ACTIVE</span>':(owned?'<span class="owned-badge">OWNED</span>':'');
+    var btnHtml;
+    if(isActive){btnHtml='<button class="shop-btn equipped" disabled>✓ Equipped</button>'}
+    else if(owned){btnHtml='<button class="shop-btn equip" onclick="equipTheme(\''+item.id+'\')">Equip</button>'}
+    else{btnHtml='<button class="shop-btn buy"'+(coins<item.price?' disabled':''+' onclick="buyTheme(\''+item.id+'\')"')+'>'+(coins<item.price?'🔒 ':'')+' 🪙 '+item.price+'</button>'}
+    div.innerHTML=badge+'<div class="shop-preview" style="background:'+item.preview+'"></div><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div>'+btnHtml;
+    grid.appendChild(div);
+  });
+}
+function buyTheme(id){var item=shopItems.find(function(i){return i.id===id});if(!item||coins<item.price){showToast('❌ Not enough coins!');return}coins-=item.price;ownedThemes.push(id);equipTheme(id)}
+function equipTheme(id){activeTheme=id;applyTheme(id);saveData();updateCoinDisplays();renderShop();showToast('✅ '+shopItems.find(function(i){return i.id===id}).name+' applied!')}
+function applyTheme(id){document.body.className=document.body.className.replace(/theme-\S+/g,'').trim();if(id!=='default')document.body.classList.add('theme-'+id)}
+
+/* ── COINS ── */
+function updateCoinDisplays(){document.getElementById('headerCoins').textContent=coins;document.getElementById('drawerCoins').textContent=coins;var rc=document.getElementById('raceTotalCoins');if(rc)rc.textContent=coins;var sc=document.getElementById('shopCoins');if(sc)sc.textContent=coins}
+
+/* ── TOAST ── */
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},3000)}
+
+/* ── INIT ── */
+applyTheme(activeTheme);
+updateCoinDisplays();
+updateDisplay();
+updateRing();
+updateSessionList();
+updateSessionInfo();
+initSliders();
+renderStudyTabs();
+
+document.getElementById('statSessions').textContent=completedSessions;
+document.getElementById('statMinutes').textContent=todayMinutes>=60?Math.floor(todayMinutes/60):todayMinutes;
+document.getElementById('statBreaks').textContent=todayBreaks;
+document.getElementById('statStreak').textContent=streak+'🔥';
+</script>
+</body>
+</html>
